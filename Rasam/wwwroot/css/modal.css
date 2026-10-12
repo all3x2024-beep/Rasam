@@ -1,0 +1,2696 @@
+﻿/* =========================================================
+   1. Theme Variables & Defaults
+========================================================= */
+
+:root {
+    --overlay-bg: rgba(15, 23, 42, 0.6);
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text-color: #1e293b;
+    --heading: #0f172a;
+    --muted: #64748b;
+    --muted-2: #94a3b8;
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    /* Status Colors */
+    --danger: #dc2626;
+    --danger-bg: #fff5f6;
+    --danger-border: #fecdd3;
+    --danger-fg: #dc2626;
+    --warn-bd: #fed7aa;
+    --warn-bg: #fff7ed;
+    --warn-fg: #7c2d12;
+    --info-bd: #cbd5e1;
+    --info-bg: #f8fafc;
+    --info-fg: #1e293b;
+    --ok-bd: #bbf7d0;
+    --ok-bg: #f0fdf4;
+    --ok-fg: #166534;
+    --violet-bd: #ddd6fe;
+    --violet-bg: #f5f3ff;
+    --violet-fg: #6d28d9;
+}
+
+/* =========================================================
+   2. General Form Controls & Base Inputs
+========================================================= */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .form-group label {
+        margin-bottom: 2px;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--heading);
+    }
+
+.input,
+select.input,
+textarea.input,
+.social-picker,
+.social-value-input,
+.social-custom-name {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    outline: none;
+    color: var(--text-color);
+    background: var(--surface);
+    font-size: 13px;
+    line-height: 38px;
+    box-sizing: border-box;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+    .input:focus,
+    .social-picker:focus,
+    .social-value-input:focus,
+    .social-custom-name:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
+    }
+
+    select.input option,
+    .social-picker option {
+        font-size: 13px;
+        padding: 4px 8px;
+        color: var(--text-color);
+    }
+
+/* =========================================================
+   3. Smart Select & Country Picker Components
+========================================================= */
+
+.smart-select-chip,
+#addRecordModal .smart-select-chip,
+#editModal .smart-select-chip {
+    border: 1px solid var(--info-bd);
+    background: var(--info-bg);
+    color: var(--info-fg);
+    font-size: 12px;
+}
+
+    .smart-select-chip button,
+    #addRecordModal .smart-select-chip button,
+    #editModal .smart-select-chip button {
+        border: 1px solid var(--info-bd);
+        background: transparent;
+        color: var(--info-fg);
+        font-size: 12px;
+    }
+
+        .smart-select-chip button:hover,
+        #addRecordModal .smart-select-chip button:hover,
+        #editModal .smart-select-chip button:hover {
+            border-color: var(--info-fg);
+            background: var(--info-bd);
+            color: var(--info-fg);
+        }
+
+.smart-select-option,
+.country-picker-option {
+    font-size: 13px;
+}
+
+    .smart-select-option.is-selected,
+    .country-picker-option:hover,
+    .country-picker-option.is-selected {
+        background: var(--info-bg);
+        color: var(--info-fg);
+    }
+
+.smart-option-check {
+    color: var(--info-fg);
+}
+
+.smart-select-option.is-selected .smart-option-check {
+    border-color: var(--info-bd);
+    background: var(--info-bg);
+}
+
+/* =========================================================
+   4. Table & Social Media Box (FIXED GRID & MARGIN)
+========================================================= */
+
+td.col-actions {
+    width: 84px;
+    white-space: nowrap;
+}
+
+.row-actions {
+    align-items: center;
+}
+
+    .row-actions button {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .row-actions .graph-btn {
+        color: var(--violet-fg);
+        background: var(--violet-bg);
+        border-color: var(--violet-bd);
+    }
+
+        .row-actions .graph-btn:hover {
+            background: var(--violet-bd);
+        }
+
+    .row-actions button:focus-visible {
+        outline: 2px solid var(--primary-text, var(--primary));
+        outline-offset: 2px;
+    }
+
+/* اصلاح کامل باکس و ورودی‌های شبکه اجتماعی */
+
+.social-box {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    background-color: var(--surface-alt);
+    box-sizing: border-box;
+}
+
+.social-add-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) minmax(120px, 1.5fr) auto;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 14px; /* فاصله مناسب تا جدول زیرین */
+}
+
+    /* حالت زمانی که فیلد نام دلخواه (Custom Name) اضافه می‌شود */
+
+    .social-add-row.has-custom {
+        grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(120px, 1.2fr) auto;
+    }
+
+    .social-add-row .social-picker,
+    .social-add-row .social-custom-name,
+    .social-add-row .social-value-input,
+    .social-add-row .input {
+        min-width: 0;
+        width: 100%;
+        height: 38px;
+        font-size: 13px;
+    }
+
+    .social-add-row .btn {
+        height: 38px;
+        padding: 0 14px;
+        white-space: nowrap;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+.social-table-wrap {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--surface);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.social-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 0;
+}
+
+    .social-table th,
+    .social-table td {
+        padding: 8px 10px;
+        text-align: right;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+        font-size: 13px;
+        box-sizing: border-box;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+        .social-table th:last-child,
+        .social-table td:last-child {
+            border-left: none;
+        }
+
+    .social-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .social-table thead th {
+        background-color: var(--surface-alt);
+        color: var(--heading);
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+.social-col-idx {
+    width: 40px;
+    text-align: center !important;
+}
+
+.social-col-act {
+    width: 50px;
+    text-align: center !important;
+}
+
+/* =========================================================
+   5. Relations Grid Layout
+========================================================= */
+
+#editRelationRows {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    background-color: var(--surface-alt);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.relation-row,
+#newRelationRows .relation-row-item {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+    .relation-row .btn-danger,
+    .relation-row-item .btn-remove-relation {
+        height: 38px;
+        padding: 0 12px;
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+#editRelationRows .form-group,
+#editRelationRows .relation-row > div {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+#editRelationRows .relation-row,
+#editRelationRows > div:not(.relation-empty) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 0;
+    border: none !important;
+    background: transparent !important;
+    width: 100%;
+}
+
+    #editRelationRows .relation-row select,
+    #editRelationRows .relation-row input,
+    #editRelationRows > div:not(.relation-empty) select,
+    #editRelationRows > div:not(.relation-empty) input {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        width: 100%;
+        font-size: 13px;
+        height: 38px;
+    }
+
+    #editRelationRows .relation-row button,
+    #editRelationRows > div:not(.relation-empty) button {
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+/* =========================================================
+   6. Profile Image Panel (Add + Edit)
+========================================================= */
+
+.record-image-column {
+    min-height: 0;
+}
+
+.record-image-panel {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-alt);
+}
+
+.image-stage {
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    background: var(--surface);
+}
+
+    .image-stage img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+
+        .image-stage[hidden],
+        .image-stage img[hidden],
+        .image-stage-empty[hidden],
+        .image-badge[hidden],
+        .image-file-clear[hidden] {
+            display: none !important;
+        }
+
+.image-stage-empty {
+    font-size: 32px;
+    line-height: 1;
+    color: var(--muted-2);
+}
+
+.image-side {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.image-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border: 1px solid var(--info-bd);
+    border-radius: 999px;
+    background: var(--info-bg);
+    color: var(--info-fg);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+    .image-badge.is-new {
+        border-color: var(--ok-bd);
+        background: var(--ok-bg);
+        color: var(--ok-fg);
+    }
+
+.image-file-control {
+    position: relative;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.record-image-panel .image-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.record-image-column .record-image-panel .image-file-button {
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transform: none;
+    transition: background .15s ease, box-shadow .15s ease;
+}
+
+    .record-image-column .record-image-panel .image-file-button:hover {
+        background: #1d4ed8;
+    }
+
+.record-image-panel .image-file-input:focus-visible + .image-file-button {
+    outline: 2px solid var(--primary-text, var(--primary));
+    outline-offset: 2px;
+}
+
+.image-file-clear {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .image-file-clear:hover {
+        border-color: var(--danger-border);
+        background: var(--danger-bg);
+        color: var(--danger-fg);
+    }
+
+.image-file-status {
+    width: 100%;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+
+/* =========================================================
+   7. Modal Base & Confirmations
+========================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    font-size: 13px;
+}
+
+    .modal.show,
+    .modal[style*="display: block"] {
+        display: flex !important;
+        animation: modalBgIn .18s ease;
+    }
+
+.modal-content {
+    width: min(700px, 100%);
+    max-height: calc(100vh - 30px);
+    max-height: calc(100dvh - 30px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--text-color);
+    box-shadow: 0 28px 80px rgba(15, 23, 42, .30);
+    animation: modalIn .22s cubic-bezier(.22, .8, .35, 1);
+    box-sizing: border-box;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+    .modal-header h3 {
+        margin: 0;
+        color: var(--heading);
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+.modal-header-sub {
+    margin-top: 3px;
+    color: var(--muted-2);
+    font-size: 11px;
+}
+
+#editRecordTitle {
+    margin-top: 5px;
+    color: var(--heading);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--surface-alt);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .18s ease, color .18s ease, transform .15s ease;
+}
+
+    .close-btn:hover {
+        background: var(--border);
+        color: var(--heading);
+    }
+
+    .close-btn:active {
+        transform: scale(0.95);
+    }
+
+    .close-btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+.modal-body {
+    padding: 18px;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    font-size: 13px;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px 17px;
+    border-top: 1px solid var(--border);
+}
+
+    .modal-footer .btn {
+        font-size: 13px;
+        height: 38px;
+    }
+
+/* Delete Confirmation Modal */
+
+.delete-confirm-content {
+    width: min(430px, calc(100% - 30px));
+    border-radius: 16px;
+}
+
+.delete-confirm-message {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--warn-bd);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fffaf5 0%, var(--warn-bg) 100%);
+    color: var(--warn-fg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+}
+
+.delete-confirm-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--warn-bd);
+    border-radius: 50%;
+    background: #ffedd5;
+    color: #ea580c;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(234, 88, 12, 0.08);
+}
+
+/* Modal Animations */
+
+@keyframes modalBgIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   8. Settings Section
+========================================================= */
+
+.settings-content {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.settings-section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
+}
+
+.settings-section {
+    position: relative;
+    margin-bottom: 24px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .03), 0 10px 30px rgba(15, 23, 42, .04);
+    transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+
+    .settings-section:hover {
+        border-color: var(--border-strong);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, .04), 0 16px 36px rgba(15, 23, 42, .06);
+    }
+
+    .settings-section:last-child {
+        margin-bottom: 0;
+    }
+
+.settings-section-header {
+    margin-bottom: 18px;
+}
+
+    .settings-section-header h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 6px;
+        color: var(--heading);
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.4;
+        letter-spacing: -.01em;
+    }
+
+    .settings-section-header p {
+        max-width: 680px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+.tag-create-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+    .tag-create-row input {
+        flex: 1;
+        min-width: 0;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        outline: none;
+        background: var(--surface);
+        color: var(--text-color);
+        font-size: 13px;
+        line-height: 40px;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, .02);
+        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+        .tag-create-row input::placeholder {
+            color: var(--muted-2);
+        }
+
+        .tag-create-row input:hover {
+            border-color: var(--muted);
+        }
+
+        .tag-create-row input:focus {
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, .15), 0 2px 5px rgba(15, 23, 42, .04);
+        }
+
+    .tag-create-row .btn {
+        min-width: 90px;
+        height: 40px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: transform .18s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+        .tag-create-row .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .tag-create-row .btn:active {
+            transform: translateY(0);
+        }
+
+.settings-tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.settings-tag-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .02);
+    transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+    .settings-tag-item:hover {
+        border-color: var(--border-strong);
+        background: var(--surface);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
+        transform: translateY(-1px);
+    }
+
+.settings-item-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-delete-btn {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--danger-border);
+    border-radius: 8px;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+    .settings-delete-btn:hover {
+        border-color: var(--danger);
+        background: var(--danger);
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(220, 38, 38, .20);
+        transform: scale(1.04);
+    }
+
+    .settings-delete-btn:active {
+        transform: scale(.94);
+    }
+
+    .settings-delete-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, .20);
+    }
+
+.settings-empty {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+    color: var(--muted-2);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .settings-empty:hover {
+        border-color: var(--muted);
+        background: var(--surface-alt);
+    }
+
+/* =========================================================
+   9. Responsive & Media Queries
+========================================================= */
+
+@media (min-width: 901px) {
+    #addRecordModal .record-core-layout,
+    #editModal .record-core-layout {
+        grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
+    }
+
+    #addRecordModal .record-fields-column,
+    #editModal .record-fields-column {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 900px) {
+    .record-image-panel {
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .settings-section {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .tag-create-row {
+        flex-direction: column;
+    }
+
+        .tag-create-row .btn {
+            width: 100%;
+        }
+
+    .modal-content {
+        border-radius: 14px;
+    }
+
+    .relation-row,
+    #newRelationRows .relation-row-item {
+        grid-template-columns: 1fr;
+    }
+
+    /* در موبایل فیلدهای شبکه اجتماعی عمودی و تمیز می‌افتند */
+
+    .social-add-row,
+    .social-add-row.has-custom {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    #editRelationRows .relation-row,
+    #editRelationRows > div:not(.relation-empty) {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 420px) {
+    .record-image-panel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .image-side {
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   Modal / Social Picker UX fixes
+   ========================================================= */
+
+.modal-content > form {
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+    .modal-content > form > .modal-body {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+.social-add-row {
+    grid-template-columns: minmax(180px,1.05fr) minmax(220px,1.45fr) auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .social-add-row .social-picker {
+        position: relative;
+        min-width: 0;
+        width: 100%;
+        height: 38px;
+    }
+
+    .social-add-row .social-picker-btn {
+        width: 100%;
+        height: 38px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--text-color);
+        cursor: pointer;
+        text-align: right;
+        line-height: 1;
+    }
+
+        .social-add-row .social-picker-btn:hover {
+            border-color: var(--muted);
+            background: var(--surface);
+        }
+
+.social-picker-current {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+    .social-picker-current .social-logo-inline, .social-picker-item .social-logo-inline {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.social-picker-caret {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    opacity: .6;
+    transition: transform .16s ease;
+}
+
+.social-picker.open .social-picker-caret {
+    transform: rotate(225deg) translate(-1px,-1px);
+}
+
+.social-picker-panel {
+    position: absolute;
+    z-index: 1200;
+    top: calc(100% + 6px);
+    right: 0;
+    left: 0;
+    width: 100%;
+    min-width: 230px;
+    max-height: 280px;
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 14px 35px rgba(15,23,42,.16);
+    box-sizing: border-box;
+}
+
+.social-picker-search {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    height: 34px;
+    margin: 0 0 5px;
+    padding: 0 9px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--surface-alt);
+    color: var(--text-color);
+    font: inherit;
+    box-sizing: border-box;
+}
+
+    .social-picker-search:focus {
+        border-color: var(--primary);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    }
+
+.social-picker-item {
+    width: 100%;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    margin: 1px 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-color);
+    font: inherit;
+    text-align: right;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+    .social-picker-item:hover, .social-picker-item.active {
+        background: var(--surface-alt);
+        color: var(--heading);
+    }
+
+    .social-picker-item.is-placeholder {
+        color: var(--muted);
+    }
+
+.social-picker-no-results {
+    padding: 10px 8px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.social-add-row.has-custom {
+    grid-template-columns: minmax(150px,1fr) minmax(150px,1fr) minmax(190px,1.25fr) auto;
+}
+
+.textarea-input, #newRecordNotes, #editNotes {
+    min-height: 96px;
+    height: auto;
+    padding: 10px 11px;
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.close-btn {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-alt);
+    color: var(--muted);
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    font-size: 0;
+    position: relative;
+    cursor: pointer;
+    transition: transform .16s ease,background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease;
+}
+
+    .close-btn::before, .close-btn::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 15px;
+        height: 1.8px;
+        border-radius: 999px;
+        background: currentColor;
+    }
+
+    .close-btn::before {
+        transform: translate(-50%,-50%) rotate(45deg);
+    }
+
+    .close-btn::after {
+        transform: translate(-50%,-50%) rotate(-45deg);
+    }
+
+    .close-btn:hover {
+        border-color: var(--danger-border);
+        background: var(--danger-bg);
+        color: var(--danger);
+        box-shadow: 0 4px 12px rgba(220,38,38,.12);
+        transform: rotate(3deg);
+    }
+
+    .close-btn:active {
+        transform: scale(.94);
+    }
+
+    .close-btn:focus-visible {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+    }
+
+@media (max-width:760px) {
+    .social-add-row, .social-add-row.has-custom {
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    }
+
+        .social-add-row .social-picker {
+            grid-column: 1/-1;
+        }
+
+        .social-add-row .btn {
+            width: 100%;
+        }
+}
+
+@media (max-width:576px) {
+    .social-add-row, .social-add-row.has-custom {
+        grid-template-columns: 1fr;
+    }
+
+        .social-add-row .social-picker {
+            grid-column: auto;
+        }
+
+    .social-picker-panel {
+        max-height: 240px;
+    }
+}
+
+/* Final fixes: social picker + modal close */
+
+.social-network-select[aria-hidden="true"] {
+    display: none !important;
+}
+
+.social-add-row {
+    grid-template-columns: minmax(190px,1.05fr) minmax(0,1.45fr) auto !important;
+}
+
+    .social-add-row.has-custom {
+        grid-template-columns: minmax(150px,1fr) minmax(150px,1fr) minmax(0,1.25fr) auto !important;
+    }
+
+.social-picker {
+    position: relative !important;
+    z-index: 5;
+}
+
+.social-picker-panel {
+    z-index: 9999 !important;
+    overflow: hidden !important;
+    padding: 7px !important;
+}
+
+.social-picker-search {
+    display: block !important;
+    position: relative !important;
+    z-index: 2 !important;
+    pointer-events: auto !important;
+    margin-bottom: 7px !important;
+}
+
+.social-picker-items {
+    max-height: 210px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+.social-picker-item[hidden] {
+    display: none !important;
+}
+
+.close-btn {
+    font-size: 0 !important;
+}
+
+    .close-btn::before, .close-btn::after {
+        content: "" !important;
+        display: block !important;
+    }
+
+@media (max-width:760px) {
+    .social-add-row, .social-add-row.has-custom {
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    }
+
+        .social-add-row .social-picker {
+            grid-column: 1 / -1 !important;
+        }
+
+        .social-add-row .social-value-input {
+            grid-column: 1 / 2;
+        }
+
+        .social-add-row .btn {
+            grid-column: 2 / 3;
+            width: 100%;
+        }
+}
+
+@media (max-width:576px) {
+    .social-add-row, .social-add-row.has-custom {
+        grid-template-columns: 1fr !important;
+    }
+
+        .social-add-row .social-picker, .social-add-row .social-value-input, .social-add-row .btn {
+            grid-column: auto !important;
+        }
+}
+
+/* =========================================================
+   RECORD FORM & MODALS — UNIFIED STYLES
+   Scoped to #addRecordModal and #editModal
+========================================================= */
+
+/* ---------- Core Modal Structure ---------- */
+
+#addRecordModal .modal-content,
+#editModal .modal-content {
+    width: min(980px, 100%);
+}
+
+#addRecordModal .modal-body,
+#editModal .modal-body {
+    padding: 18px 20px;
+}
+
+#addRecordModal .form-grid,
+#editModal .form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+#addRecordModal .form-group,
+#editModal .form-group {
+    min-width: 0;
+    gap: 5px;
+    padding: 5px;
+}
+
+    #addRecordModal .form-group label,
+    #editModal .form-group label {
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    #addRecordModal .form-group.full,
+    #editModal .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+/* ---------- Modal Header ---------- */
+
+#addRecordModal .modal-header,
+#editModal .modal-header {
+    min-height: 68px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--surface), var(--surface-alt));
+}
+
+    #addRecordModal .modal-header > div:first-child,
+    #editModal .modal-header > div:first-child {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    #addRecordModal .modal-header h3,
+    #editModal .modal-header h3 {
+        margin: 0;
+        color: var(--heading);
+        font-size: 17px;
+        font-weight: 950;
+        line-height: 1.5;
+        letter-spacing: -.15px;
+    }
+
+#addRecordModal .modal-header-sub,
+#editModal .modal-header-sub,
+#editRecordTitle {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+#editRecordTitle {
+    color: #2563eb;
+}
+
+#addRecordModal .close-btn,
+#editModal .close-btn {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 21px;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, .06);
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+    #addRecordModal .close-btn:hover,
+    #editModal .close-btn:hover {
+        border-color: var(--border-strong);
+        background: var(--surface-alt);
+        color: var(--heading);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 12px rgba(15, 23, 42, .10);
+    }
+
+/* ---------- Record Core Layout & Grid Rows ---------- */
+
+#addRecordModal .record-core-layout,
+#editModal .record-core-layout {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+}
+
+#addRecordModal .record-fields-column,
+#editModal .record-fields-column {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#addRecordModal .record-fields-row,
+#editModal .record-fields-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    min-width: 0;
+}
+
+    #addRecordModal .record-fields-row > .form-group,
+    #editModal .record-fields-row > .form-group {
+        min-width: 0;
+    }
+
+.form-row-topic-meta {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 11px;
+    align-items: end;
+}
+
+    .form-row-topic-meta .form-group {
+        min-width: 0;
+    }
+
+.form-row-4 {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+    .form-row-4 > .form-group {
+        min-width: 0;
+        grid-column: auto;
+    }
+
+/* ---------- Smart Multi-Select & Chips ---------- */
+
+#addRecordModal > .modal-content .form-group.full:has(.smart-multi-select),
+#editModal > .modal-content .form-group.full:has(.smart-multi-select) {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 0;
+    padding-top: 5px;
+}
+
+#addRecordModal .smart-select-native,
+#editModal .smart-select-native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+}
+
+#addRecordModal .smart-select-ui,
+#editModal .smart-select-ui {
+    position: relative;
+    width: 100%;
+    min-height: 42px;
+    z-index: 20;
+}
+
+#addRecordModal .smart-select-head,
+#editModal .smart-select-head {
+    position: relative;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 34px 5px 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+    #addRecordModal .smart-select-head:hover,
+    #editModal .smart-select-head:hover {
+        border-color: #94a3b8;
+        background: var(--surface-alt);
+    }
+
+#addRecordModal .smart-select-ui.is-open .smart-select-head,
+#editModal .smart-select-ui.is-open .smart-select-head {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+    background: var(--surface);
+}
+
+.smart-select-placeholder {
+    color: var(--muted-2);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.smart-select-chips {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+    .smart-select-chips:empty + .smart-select-placeholder {
+        display: inline-flex;
+    }
+
+#addRecordModal .smart-select-chip,
+#editModal .smart-select-chip,
+.smart-select-chip {
+    max-width: 220px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 3px 5px 3px 9px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #f0f7ff;
+    color: #1d4ed8;
+    font-size: 11px;
+    line-height: 1.25;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, .06);
+}
+
+    #addRecordModal .smart-select-chip span,
+    #editModal .smart-select-chip span,
+    .smart-select-chip span {
+        min-width: 0;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #addRecordModal .smart-select-chip button,
+    #editModal .smart-select-chip button,
+    .smart-select-chip button {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #bfdbfe;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #2563eb;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1;
+        cursor: pointer;
+        transition: background .15s ease, border-color .15s ease, color .15s ease, transform .12s ease;
+    }
+
+        #addRecordModal .smart-select-chip button:hover,
+        #editModal .smart-select-chip button:hover,
+        .smart-select-chip button:hover {
+            border-color: #93c5fd;
+            background: #dbeafe;
+            color: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+        #addRecordModal .smart-select-chip button:active,
+        #editModal .smart-select-chip button:active {
+            transform: scale(.94);
+        }
+
+        #addRecordModal .smart-select-chip button:focus-visible,
+        #editModal .smart-select-chip button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+        }
+
+.smart-select-count {
+    margin-inline-start: auto;
+    color: var(--muted);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.smart-select-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    left: 0;
+    display: none;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, .16);
+}
+
+.smart-select-ui.is-open .smart-select-panel {
+    display: block;
+    animation: smartPickerIn .16s ease;
+}
+
+.smart-select-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 40px;
+    padding: 5px 9px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--muted);
+}
+
+    .smart-select-search-wrap input {
+        width: 100%;
+        height: 30px;
+        padding: 0 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        outline: none;
+        background: var(--surface);
+        color: var(--text-color);
+        font-size: 12px;
+    }
+
+        .smart-select-search-wrap input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+        }
+
+.smart-select-options {
+    max-height: 190px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.smart-select-option {
+    width: 100%;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color);
+    text-align: right;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+    .smart-select-option:hover {
+        background: var(--surface-alt);
+    }
+
+    .smart-select-option.is-selected {
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 800;
+    }
+
+.smart-option-check {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    color: #2563eb;
+    font-size: 12px;
+}
+
+.smart-select-option.is-selected .smart-option-check {
+    border-color: #93c5fd;
+    background: #dbeafe;
+}
+
+.smart-select-empty {
+    padding: 18px 10px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* ---------- Country Picker ---------- */
+
+#addRecordModal .country-picker,
+#editModal .country-picker {
+    position: relative;
+    width: 100%;
+}
+
+#addRecordModal .country-picker-input,
+#editModal .country-picker-input {
+    padding-left: 34px;
+    cursor: pointer;
+}
+
+#addRecordModal .country-picker-panel,
+#editModal .country-picker-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    left: 0;
+    z-index: 40;
+    display: none;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, .16);
+}
+
+#addRecordModal .country-picker.is-open .country-picker-panel,
+#editModal .country-picker.is-open .country-picker-panel {
+    display: block;
+    animation: smartPickerIn .16s ease;
+}
+
+.country-picker-search {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 40px;
+    padding: 5px 9px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--muted);
+}
+
+    .country-picker-search input {
+        width: 100%;
+        height: 30px;
+        padding: 0 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        outline: none;
+        background: var(--surface);
+        color: var(--text-color);
+        font-size: 12px;
+    }
+
+        .country-picker-search input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+        }
+
+.country-picker-options {
+    max-height: 210px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.country-picker-option {
+    width: 100%;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 9px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    text-align: right;
+    font-size: 12px;
+}
+
+    .country-picker-option:hover,
+    .country-picker-option.is-selected {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .country-picker-option.is-selected {
+        font-weight: 800;
+    }
+
+.country-picker-empty {
+    padding: 18px 10px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* ---------- Social Media Section & Picker ---------- */
+
+#addRecordModal .social-add-row,
+#editModal .social-add-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+    #addRecordModal .social-add-row .btn,
+    #editModal .social-add-row .btn {
+        height: 40px;
+        padding-inline: 13px;
+        border-radius: 9px;
+        font-size: 12px;
+    }
+
+    #addRecordModal .social-add-row .input,
+    #editModal .social-add-row .input {
+        height: 40px;
+    }
+
+.social-network-select {
+    display: none !important;
+}
+
+.social-picker,
+#addRecordModal .social-picker,
+#editModal .social-picker {
+    position: relative;
+    min-width: 200px;
+}
+
+.social-picker-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    cursor: pointer;
+    text-align: start;
+}
+
+#addRecordModal .social-picker-btn,
+#editModal .social-picker-btn {
+    position: relative;
+    padding-inline-start: 34px;
+}
+
+.social-picker-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.social-picker-placeholder {
+    opacity: .65;
+}
+
+.social-picker-panel {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% + 4px);
+    z-index: 60;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px;
+    border: 1px solid rgba(127, 127, 127, .35);
+    border-radius: 10px;
+    background: var(--pk-bg, #fff);
+    color: var(--pk-fg, inherit);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .22);
+}
+
+    .social-picker-panel[hidden] {
+        display: none;
+    }
+
+.social-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+}
+
+    .social-picker-item:hover,
+    .social-picker-item:focus-visible {
+        background: rgba(127, 127, 127, .18);
+        outline: none;
+    }
+
+    .social-picker-item.active {
+        background: rgba(37, 99, 235, .16);
+    }
+
+    .social-picker-item.is-placeholder {
+        opacity: .7;
+    }
+
+.social-logo-inline {
+    display: inline-flex;
+    flex: 0 0 auto;
+    line-height: 0;
+}
+
+.social-network {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.social-logo {
+    display: inline-flex;
+    line-height: 0;
+    padding: 3px;
+    border-radius: 8px;
+    cursor: default;
+    transition: transform .12s, background .12s;
+}
+
+    .social-logo:hover,
+    .social-logo:focus-visible {
+        transform: translateY(-1px);
+        background: rgba(127, 127, 127, .18);
+        outline: none;
+    }
+
+.social-tip {
+    position: fixed;
+    z-index: 100000;
+    max-width: 280px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #fff;
+    font-size: 12.5px;
+    line-height: 1.5;
+    direction: ltr;
+    unicode-bidi: plaintext;
+    word-break: break-all;
+    pointer-events: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+}
+
+    .social-tip[hidden] {
+        display: none;
+    }
+
+/* ---------- Unified Chevron Icons ---------- */
+
+#addRecordModal .record-fields-column select.input,
+#editModal .record-fields-column select.input,
+#addRecordModal .relation-row select.input,
+#editModal .relation-row select.input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-inline-end: 30px;
+    background-color: var(--surface);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23647569' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    background-size: 11px 7px;
+}
+
+#addRecordModal .smart-select-arrow,
+#editModal .smart-select-arrow,
+#addRecordModal .country-picker-arrow,
+#editModal .country-picker-arrow,
+#addRecordModal .social-picker-caret,
+#editModal .social-picker-caret,
+.social-picker-caret {
+    width: 8px;
+    height: 8px;
+    border-right: 1.7px solid currentColor;
+    border-bottom: 1.7px solid currentColor;
+    border-radius: 1px;
+    color: var(--muted);
+    font-size: 0;
+    line-height: 0;
+    pointer-events: none;
+    transition: transform .18s ease;
+}
+
+#addRecordModal .smart-select-arrow,
+#editModal .smart-select-arrow,
+.smart-select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-65%) rotate(45deg);
+}
+
+#addRecordModal .smart-select-ui.is-open .smart-select-arrow,
+#editModal .smart-select-ui.is-open .smart-select-arrow,
+.smart-select-ui.is-open .smart-select-arrow {
+    transform: translateY(-20%) rotate(225deg);
+}
+
+#addRecordModal .country-picker-arrow,
+#editModal .country-picker-arrow {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-65%) rotate(45deg);
+}
+
+#addRecordModal .country-picker.is-open .country-picker-arrow,
+#editModal .country-picker.is-open .country-picker-arrow {
+    transform: translateY(-20%) rotate(225deg);
+}
+
+#addRecordModal .social-picker-caret,
+#editModal .social-picker-caret {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-65%) rotate(45deg);
+}
+
+#addRecordModal .social-picker.open .social-picker-caret,
+#editModal .social-picker.open .social-picker-caret {
+    transform: translateY(-20%) rotate(225deg);
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes smartPickerIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Responsive Breakpoints ---------- */
+
+@media (max-width: 900px) {
+    .form-row-topic-meta,
+    .form-row-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #addRecordModal .record-core-layout,
+    #editModal .record-core-layout {
+        grid-template-columns: 1fr;
+    }
+
+    #addRecordModal .record-fields-row,
+    #editModal .record-fields-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    #addRecordModal .form-grid,
+    #editModal .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    #addRecordModal .modal-body,
+    #editModal .modal-body {
+        padding: 14px;
+    }
+
+    #addRecordModal .modal-header,
+    #editModal .modal-header {
+        min-height: 62px;
+        padding: 11px 13px;
+    }
+
+        #addRecordModal .modal-header h3,
+        #editModal .modal-header h3 {
+            font-size: 15px;
+        }
+
+    #addRecordModal .modal-header-sub,
+    #editModal .modal-header-sub,
+    #editRecordTitle {
+        font-size: 10.5px;
+    }
+
+    #addRecordModal .form-grid,
+    #editModal .form-grid,
+    #addRecordModal .social-add-row,
+    #editModal .social-add-row,
+    #addRecordModal .record-fields-row,
+    #editModal .record-fields-row {
+        grid-template-columns: 1fr;
+    }
+
+    #addRecordModal .smart-select-chip,
+    #editModal .smart-select-chip {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .form-row-topic-meta,
+    .form-row-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #addRecordModal .smart-select-panel,
+    #editModal .smart-select-panel,
+    #addRecordModal .country-picker-panel,
+    #editModal .country-picker-panel {
+        animation: none;
+    }
+}
+
+.social-del-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--danger-border, var(--danger-bd, #fecaca));
+    border-radius: 8px;
+    background: var(--danger-bg);
+    color: var(--danger-fg);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+}
+
+    .social-del-btn:hover {
+        transform: translateY(-1px);
+        background: var(--danger-bd, #fecaca);
+    }
+
+#newRelationRows .relation-row .btn,
+#editRelationRows .relation-row .btn {
+    flex: none;
+    height: 38px;
+}
+
+.social-table .del-btn {
+    width: 30px;
+    height: 30px;
+}
+
+.social-table td.social-col-act,
+.social-table th.social-col-act {
+    width: 54px;
+    padding-inline: 6px;
+    text-align: center !important;
+    overflow: visible;
+}
+
+/* =========================================================
+   modal-polish.css
+   این فایل را «بعد از» style.css / modal.css / modal-addoredit.css / graph.css لود کنید.
+   (یا محتوایش را به انتهای modal-addoredit.css اضافه کنید.)
+========================================================= */
+
+/* ---------- 0. Tokens (تعارض --primary بین style.css و modal.css) ---------- */
+
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --focus-ring: rgba(37, 99, 235, .18);
+}
+
+html.dark {
+    --focus-ring: rgba(96, 165, 250, .28);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* ---------- 1. Modal frame ---------- */
+
+.modal {
+    padding: 16px;
+}
+
+.modal-content {
+    max-height: min(calc(100vh - 32px), 920px);
+    max-height: min(calc(100dvh - 32px), 920px);
+    border: 1px solid var(--border);
+}
+
+.modal-header {
+    background: var(--surface-alt);
+}
+
+.modal-footer {
+    background: var(--surface-alt);
+}
+
+.modal-body {
+    scrollbar-gutter: stable;
+}
+
+/* ---------- 2. Unified focus ring ---------- */
+
+.input:focus,
+.social-value-input:focus,
+.social-custom-name:focus,
+.social-picker-btn:focus-visible,
+.social-picker.open .social-picker-btn,
+.social-picker-search:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--focus-ring) !important;
+    outline: none;
+}
+
+/* ---------- 3. Small buttons ---------- */
+
+.btn-sm {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+}
+
+/* ---------- 4. Social network picker ---------- */
+
+/* wrapper: دیگر مثل input جعبه‌دار نباشد (باعث دوبل‌شدن border و قطع‌شدن پنل می‌شد) */
+
+.social-add-row .social-picker {
+    position: relative !important;
+    z-index: 5;
+    display: block !important;
+    width: 100%;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    line-height: normal !important;
+}
+
+    .social-add-row .social-picker.open {
+        z-index: 30;
+    }
+
+.social-add-row .social-picker-btn,
+.social-add-row .social-value-input,
+.social-add-row .social-custom-name,
+.social-add-row .btn {
+    height: 40px !important;
+}
+
+.social-add-row .social-value-input,
+.social-add-row .social-custom-name {
+    line-height: normal;
+}
+
+.social-add-row .social-picker-btn {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding-block: 0 !important;
+    padding-inline: 10px 34px !important; /* جای فلش در سمت انتهایی */
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.2 !important;
+    text-align: start;
+    cursor: pointer;
+}
+
+    .social-add-row .social-picker-btn:hover {
+        border-color: var(--muted);
+    }
+
+.social-picker-current {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    overflow: hidden;
+}
+
+    .social-picker-current > span:last-child {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.social-picker-placeholder {
+    color: var(--muted);
+    opacity: 1;
+}
+
+.social-picker-caret,
+#addRecordModal .social-picker-caret,
+#editModal .social-picker-caret {
+    position: absolute;
+    top: 50%;
+    left: auto;
+    inset-inline-end: 13px;
+    width: 7px;
+    height: 7px;
+    flex: none;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+}
+
+.social-picker.open .social-picker-caret,
+#addRecordModal .social-picker.open .social-picker-caret,
+#editModal .social-picker.open .social-picker-caret {
+    transform: translateY(-25%) rotate(225deg);
+}
+
+/* پنل با position:fixed و با JS جایگذاری می‌شود (داخل modal-body بریده نشود) */
+
+.social-picker-panel {
+    position: fixed;
+    z-index: 9999 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    padding: 7px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--pk-bg, var(--surface));
+    color: var(--pk-fg, var(--text-color));
+    box-shadow: 0 14px 35px rgba(15, 23, 42, .22);
+    box-sizing: border-box;
+}
+
+    .social-picker-panel[hidden] {
+        display: none !important;
+    }
+
+.social-picker-search {
+    position: static !important;
+    flex: 0 0 34px;
+    width: 100%;
+    height: 34px;
+    margin: 0 !important;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface-alt);
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.social-picker-items {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: calc(var(--pk-max, 280px) - 62px) !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+.social-picker-item {
+    min-height: 36px;
+    padding: 6px 9px;
+    font-size: 13px;
+}
+
+    .social-picker-item.active {
+        background: color-mix(in srgb, var(--primary) 14%, transparent);
+        color: var(--heading);
+        font-weight: 700;
+    }
+
+.social-logo-inline svg {
+    display: block;
+}
+
+/* چیدمان ردیف افزودن شبکه (اولویت با #id تا از !importantهای قدیمی ببرد) */
+
+#addRecordModal .social-add-row,
+#editModal .social-add-row {
+    display: grid !important;
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 1.4fr) auto !important;
+    gap: 8px !important;
+    align-items: center;
+    margin: 0 0 12px !important;
+}
+
+    #addRecordModal .social-add-row.has-custom,
+    #editModal .social-add-row.has-custom {
+        grid-template-columns: minmax(150px, 1fr) minmax(130px, 1fr) minmax(0, 1.3fr) auto !important;
+    }
+
+@media (max-width: 700px) {
+    #addRecordModal .social-add-row,
+    #editModal .social-add-row,
+    #addRecordModal .social-add-row.has-custom,
+    #editModal .social-add-row.has-custom {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+    }
+
+        #addRecordModal .social-add-row .social-picker,
+        #editModal .social-add-row .social-picker,
+        #addRecordModal .social-add-row .social-custom-name,
+        #editModal .social-add-row .social-custom-name {
+            grid-column: 1 / -1 !important;
+        }
+
+        #addRecordModal .social-add-row .social-value-input,
+        #editModal .social-add-row .social-value-input {
+            grid-column: 1 / 2 !important;
+        }
+
+        #addRecordModal .social-add-row .btn,
+        #editModal .social-add-row .btn {
+            grid-column: 2 / 3 !important;
+            width: auto !important;
+        }
+}
+
+@media (max-width: 480px) {
+    #addRecordModal .social-add-row > *,
+    #editModal .social-add-row > * {
+        grid-column: 1 / -1 !important;
+    }
+
+    #addRecordModal .social-add-row .btn,
+    #editModal .social-add-row .btn {
+        width: 100% !important;
+    }
+}
+
+/* ---------- 5. Social table / empty states ---------- */
+
+.social-empty-state[hidden] {
+    display: none !important;
+}
+
+.relation-empty {
+    padding: 14px 10px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+.social-empty-state {
+    margin-bottom: 10px;
+}
+
+/* ---------- دکمه حذف یکسان (شبکه اجتماعی + روابط) ---------- */
+
+.del-btn {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--danger-border, var(--danger-bd, #fecaca)) !important;
+    border-radius: 8px;
+    background: var(--danger-bg) !important;
+    color: var(--danger-fg) !important;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+    .del-btn svg {
+        display: block;
+        pointer-events: none;
+    }
+
+    .del-btn:hover {
+        transform: translateY(-1px);
+        background: var(--danger-bd, #fecaca) !important;
+        box-shadow: 0 4px 10px rgba(220, 38, 38, .15);
+    }
+
+    .del-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, .22);
+    }
+
+/* لیست شبکه‌ها: grid به‌جای table (مستقل از استایل سراسری table/th/td) */
+
+.social-table-wrap {
+    overflow: hidden;
+}
+
+.social-grid {
+    width: 100%;
+    font-size: 13px;
+}
+
+.social-grid-head,
+.social-grid-row {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1.1fr) minmax(0, 1.6fr) 64px;
+    align-items: center;
+    column-gap: 8px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+}
+
+.social-grid-head {
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    color: var(--heading);
+    font-weight: 700;
+}
+
+.social-grid-row {
+    min-height: 46px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+    .social-grid-row:last-child {
+        border-bottom: 0;
+    }
+
+    .social-grid-row:hover {
+        background: var(--surface-alt);
+    }
+
+.social-grid .social-col-idx,
+.social-grid .social-col-act {
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center !important;
+}
+
+.social-grid .social-network {
+    min-width: 0;
+}
+
+.social-grid .social-network-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.social-grid .social-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    direction: ltr;
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+
+.social-grid .del-btn {
+    width: 32px;
+    height: 32px;
+}
+
+.social-table .social-network {
+    min-width: 0;
+}
+
+.social-table .social-value {
+    direction: ltr;
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+
+/* ---------- 6. Relations (افزودن و ویرایش یکسان) ---------- */
+
+#newRelationRows,
+#editRelationRows {
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-alt);
+    box-sizing: border-box;
+}
+
+    #newRelationRows .relation-row,
+    #editRelationRows .relation-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        margin: 0 0 8px;
+        padding: 0;
+        border: 0 !important;
+        background: transparent !important;
+    }
+
+        #newRelationRows .relation-row:last-child,
+        #editRelationRows .relation-row:last-child {
+            margin-bottom: 0;
+        }
+
+        #newRelationRows .relation-row select,
+        #editRelationRows .relation-row select {
+            flex: 1 1 0;
+            min-width: 0;
+            height: 38px;
+        }
+
+        #newRelationRows .relation-row .del-btn,
+        #editRelationRows .relation-row .del-btn {
+            width: 38px;
+            height: 38px;
+        }
+
+/* ---------- 7. Mobile ---------- */
+
+@media (max-width: 576px) {
+    .modal {
+        padding: 8px;
+    }
+
+    .modal-content {
+        border-radius: 14px;
+        max-height: calc(100dvh - 16px);
+    }
+
+    .modal-footer {
+        flex-wrap: wrap;
+    }
+
+        .modal-footer .btn {
+            flex: 1 1 auto;
+        }
+}

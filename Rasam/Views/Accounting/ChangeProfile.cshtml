@@ -1,0 +1,139 @@
+﻿@using Rasam.Data
+@using Rasam.Models
+@using Microsoft.EntityFrameworkCore
+@using Rasam.Models.Accounting
+@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext _context
+@inject UserManager<User> _UserManager
+
+@{
+    User user = null;
+    if (User?.Identity?.IsAuthenticated == true)
+    {
+        user = await _UserManager.FindByNameAsync(User.Identity.Name);
+    }
+}
+
+@if (TempData["msg"] is not null)
+{
+    <div class="alert alert-danger text-center mb-3">
+        @TempData["msg"]
+    </div>
+}
+
+@if (user is not null)
+{
+    <div class="portlet box shadow">
+        <div class="portlet-heading">
+            <div class="portlet-title">
+                <h3 class="title">
+                    <i class="icon-layers"></i>
+                    پروفایل کاربری
+                </h3>
+            </div>
+            <div class="buttons-box">
+                <a class="btn btn-sm btn-default btn-round btn-fullscreen" rel="tooltip" title="تمام صفحه" href="#">
+                    <i class="icon-size-fullscreen"></i>
+                </a>
+                <a class="btn btn-sm btn-default btn-round btn-collapse" rel="tooltip" title="کوچک کردن" href="#">
+                    <i class="icon-arrow-up"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="portlet-body">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-5">
+
+                    <!-- تصویر پروفایل -->
+                    <div class="d-flex justify-content-center align-items-center my-4">
+                        <div style="width: 200px; height: 200px; overflow: hidden; border-radius: 50%; border: 2px solid #ddd; background-color: #f8f9fa;">
+                            @if (string.IsNullOrEmpty(user.CreateBY))
+                            {
+                                <img src="~/assets/images/user/00.png" alt="تصویر کاربر" style="width: 100%; height: 100%; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <img src="~/@user.CreateBY" alt="تصویر کاربر" style="width: 100%; height: 100%; object-fit: cover;">
+                            }
+                        </div>
+                    </div>
+
+                    <!-- اطلاعات کاربر -->
+                    <div class="user-details text-center mb-4">
+                        <h2 class="fw-bold fs-4 mb-1">@user.UserName</h2>
+                        <h4 class="text-muted fs-6">@user.FirstName @user.LastName</h4>
+                    </div>
+
+                    <hr />
+
+                    <!-- فرم آپلود تصویر -->
+                    <form id="simple-form" asp-action="ChangeUser" asp-controller="Accounting" enctype="multipart/form-data" method="post">
+                        <div class="form-group mb-3">
+                            <!-- اینپوت اصلی فایل (پنهان شده برای استایل بهتر) -->
+                            <input type="file" id="real-file-input" name="MyFile" accept="image/*" class="d-none" required onchange="updateFileName(this)">
+
+                            <!-- اینپوت و دکمه نمایشی -->
+                            <div class="input-group">
+                                <input type="text" id="file-name-display" class="form-control" placeholder="برای آپلود کلیک کنید" readonly onclick="triggerFileInput()">
+                                <button type="button" class="btn btn-success" onclick="triggerFileInput()">
+                                    <i class="icon-picture"></i>
+                                    انتخاب عکس
+                                </button>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2 text-center">
+                                جهت نمایش مناسب، از تصاویر مربع استفاده نمایید.
+                            </small>
+                        </div>
+
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-success btn-round w-100">
+                                <i class="icon-check"></i>
+                                ذخیره تغییرات
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center">
+        کاربر یافت نشد یا وارد سیستم نشده است.
+    </div>
+}
+
+<script>
+    function triggerFileInput() {
+        document.getElementById('real-file-input').click();
+    }
+
+    function updateFileName(input) {
+        const displayInput = document.getElementById('file-name-display');
+        if (input.files && input.files.length > 0) {
+            displayInput.value = input.files[0].name;
+        } else {
+            displayInput.value = '';
+        }
+    }
+
+    function checkPasswords() {
+        const password1 = document.getElementById('password1')?.value;
+        const password2 = document.getElementById('password2')?.value;
+        const message = document.getElementById('message');
+
+        if (!message) return;
+
+        if (!password1 || !password2) {
+            message.textContent = 'لطفاً هر دو رمز عبور را وارد کنید.';
+        } else if (password1 !== password2) {
+            message.textContent = 'رمز عبور جدید و تکرار آن یکسان نیستند.';
+        } else {
+            message.textContent = '';
+        }
+    }
+</script>

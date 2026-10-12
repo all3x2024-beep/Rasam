@@ -1,0 +1,149 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "ورود به سامانه";
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - سامانه بانک اطلاعات تصویری رصام</title>
+
+    <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+	<link href="~/css/toast.css" rel="stylesheet" />
+
+</head>
+<!-- Toast Container -->
+<div class="app-toast-container-top">
+
+    @if (TempData["msg"] != null)
+    {
+        <div class="app-toast" id="systemToast">
+            <div class="app-toast-header">
+                <span class="app-toast-icon">ℹ️</span>
+                <strong class="app-toast-title">اعلان سیستم</strong>
+                <button type="button" class="btn-close-custom" onclick="closeToast()">×</button>
+            </div>
+            <!-- نوار پیشرفت زمان -->
+            <div class="app-toast-progress-container">
+                <div class="app-toast-progress-bar" id="toastProgress"></div>
+            </div>
+            <div class="app-toast-body">
+                @TempData["msg"]
+            </div>
+        </div>
+    }
+</div>
+
+<body class="login-page">
+    <canvas class="app-bg-canvas" id="appBackgroundCanvas" aria-hidden="true"></canvas>
+
+    <main class="login-shell">
+        <section class="login-card" aria-labelledby="loginTitle">
+            <div class="login-brand">
+                <div class="login-brand-icon" aria-hidden="true">🗂️</div>
+                <div>
+                    <h1 id="loginTitle">سامانه بانک اطلاعات تصویری رصام</h1>
+                    <p>ورود به پنل مدیریت اطلاعات فضای مجازی</p>
+                </div>
+            </div>
+
+            @if (TempData["msg"] != null)
+            {
+                <div class="alert alert-danger my-3 p-2 text-center" style="border-radius: 8px; font-size: 0.9rem;">
+                    @TempData["msg"]
+                </div>
+            }
+
+            <div class="login-divider"></div>
+
+            <form asp-controller="Accounting"
+                  asp-action="Login"
+                  method="post"
+                  class="login-form"
+                  autocomplete="on">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="login-validation" role="alert"></div>
+
+                <div class="login-field">
+                    <label for="UsernameTemp">نام کاربری</label>
+                    <div class="login-input-wrap">
+                        <span class="login-input-icon" aria-hidden="true">👤</span>
+                        <input id="UsernameTemp"
+                               name="UsernameTemp"
+                               type="text"
+                               class="login-input"
+                               placeholder="نام کاربری خود را وارد کنید"
+                               autocomplete="username"
+                               required />
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <div class="login-label-row">
+                        <label for="PassWordTemp">رمز عبور</label>
+                        <a href="@Url.Action("ForgotPassWordTemp", "Accounting")" class="login-link">فراموشی رمز عبور</a>
+                    </div>
+                    <div class="login-input-wrap">
+                        <span class="login-input-icon" aria-hidden="true">🔒</span>
+                        <input id="PassWordTemp"
+                               name="PassWordTemp"
+                               type="password"
+                               class="login-input"
+                               placeholder="رمز عبور خود را وارد کنید"
+                               autocomplete="current-password"
+                               required />
+                        <button type="button"
+                                class="login-PassWordTemp-toggle"
+                                id="PassWordTempToggle"
+                                aria-label="نمایش رمز عبور"
+                                title="نمایش رمز عبور">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <label class="login-remember">
+                    <input type="checkbox" name="RememberMe" value="true" />
+                    <span>مرا به خاطر بسپار</span>
+                </label>
+
+                <button type="submit" class="login-submit">
+                    <span>ورود به سامانه</span>
+                    <span aria-hidden="true">←</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <span class="status-dot active" aria-hidden="true"></span>
+                سامانه آماده به کار است
+            </div>
+        </section>
+
+        <p class="login-credit">توسعه یافته توسط سرباز گمنام</p>
+    </main>
+
+    <script>
+        (() => {
+            const toggle = document.getElementById('PassWordTempToggle');
+            const input = document.getElementById('PassWordTemp');
+
+            if (toggle && input) {
+                toggle.addEventListener('click', () => {
+                    const visible = input.type === 'text';
+                    input.type = visible ? 'password' : 'text';
+                    toggle.textContent = visible ? '👁️' : '🙈';
+                    toggle.setAttribute('aria-label', visible ? 'نمایش رمز عبور' : 'پنهان کردن رمز عبور');
+                });
+            }
+        })();
+    </script>
+
+	<script src="~/js/toast.js"></script>
+</body>
+</html>

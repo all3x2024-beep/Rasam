@@ -1,0 +1,797 @@
+﻿@using Rasam.Data
+@using Rasam.Models
+@using Rasam.Models.Accounting
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject UserManager<User> _UserManager
+@inject RoleManager<Role> _roleManager
+@inject ApplicationDbContext _context
+
+@{
+    var users = _UserManager.Users.ToList();
+    var userCount = users.Count;
+    var activeCount = users.Count(x => x.EmailConfirmed);
+    var lockedCount = userCount - activeCount;   // همان نتیجه‌ی حلقه‌ی قبلی، بدون N بار await
+    var i = 1;
+}
+
+<!-- =========================================================
+     Page-scoped layout fixes (بر پایه‌ی style.css)
+     - html/body در style.css overflow:hidden دارند، پس کارت باید
+       خودش داخل .app-main اسکرول داخلی داشته باشد.
+     - .btn در style.css display/gap ندارد و برای <a> ارتفاع اعمال نمی‌شود.
+     - .row-actions فقط align-items دارد (نه flex و نه gap).
+     این بلوک را می‌توانید به style.css منتقل کنید.
+========================================================= -->
+<style>
+    /* ---- Page layout ---- */
+    .users-page {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+        .users-page > .stats {
+            flex: 0 0 auto;
+            margin: 0;
+        }
+
+        .users-page > .card {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .users-page .page-head {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .users-page .toolbar {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .users-page .toolbar .search {
+                flex: 1 1 auto;
+                min-width: 0;
+                height: 44px; /* هم‌قد .btn */
+            }
+
+        .users-page .table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        .users-page #userTable thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--surface-alt);
+            white-space: nowrap;
+        }
+
+        .users-page #userTable td {
+            vertical-align: middle;
+        }
+
+        .users-page .empty-state {
+            cursor: default;
+        }
+
+        /* ---- Buttons (همه‌ی .btn ها: a / button / span یک‌شکل) ---- */
+        .users-page .btn,
+        #AddUser .btn,
+        #EditUser .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .users-page .row-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+            .users-page .row-actions .btn {
+                width: 32px;
+                height: 32px;
+                padding: 0;
+                border-radius: 8px;
+                font-size: 13px;
+            }
+
+    /* ---- Modals ---- */
+    #AddUser .modal-content,
+    #EditUser .modal-content {
+        width: min(640px, 100%);
+        max-height: calc(100dvh - 32px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #AddUser form,
+    #EditUser form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    #AddUser .modal-body,
+    #EditUser .modal-body {
+        overflow-y: auto;
+        padding: 18px 20px;
+    }
+
+    #AddUser .modal-footer,
+    #EditUser .modal-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+    }
+
+    #AddUser .record-image-panel {
+        margin-bottom: 16px;
+    }
+
+    #AddUser .image-file-button {
+        gap: 6px;
+    }
+
+    #AddUser .form-grid,
+    #EditUser .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 16px;
+    }
+
+    #AddUser .form-group,
+    #EditUser .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    #AddUser .form-label,
+    #EditUser .form-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        font-size: 13px;
+    }
+
+        #AddUser .form-label i,
+        #EditUser .form-label i {
+            color: var(--primary-text);
+        }
+
+    #AddUser .input-with-icon,
+    #EditUser .input-with-icon {
+        position: relative;
+    }
+
+    #AddUser .input-icon,
+    #EditUser .input-icon {
+        position: absolute;
+        top: 50%;
+        inset-inline-start: 12px;
+        transform: translateY(-50%);
+        color: var(--muted-2);
+        pointer-events: none;
+    }
+
+    #AddUser .input-with-icon .input,
+    #EditUser .input-with-icon .input {
+        width: 100%;
+        height: 44px;
+        padding-inline: 38px 12px;
+    }
+
+    @@media (max-width: 576px) {
+        .users-page .toolbar {
+            flex-wrap: wrap;
+        }
+
+            .users-page .toolbar .search {
+                flex-basis: 100%;
+            }
+
+        #AddUser .form-grid,
+        #EditUser .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Toast Container -->
+<div class="app-toast-container-top">
+    @if (TempData["msg"] != null)
+    {
+        <div class="app-toast" id="systemToast">
+            <div class="app-toast-header">
+                <span class="app-toast-icon">ℹ️</span>
+                <strong class="app-toast-title">اعلان سیستم</strong>
+                <button type="button" class="btn-close-custom" onclick="closeToast()">×</button>
+            </div>
+            <!-- نوار پیشرفت زمان -->
+            <div class="app-toast-progress-container">
+                <div class="app-toast-progress-bar" id="toastProgress"></div>
+            </div>
+            <div class="app-toast-body">
+                @TempData["msg"]
+            </div>
+        </div>
+    }
+</div>
+
+<div class="users-page">
+
+    <!-- Stats -->
+    <div class="stats">
+
+        <div class="stat">
+            <div class="stat-top">
+                <div class="stat-text">
+                    <div class="stat-label">کل کاربران</div>
+                    <div class="stat-value">@userCount</div>
+                </div>
+                <i class="fas fa-users fa-lg"></i>
+            </div>
+            <div class="stat-caption">تعداد کل کاربران ثبت شده</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <div class="stat-text">
+                    <div class="stat-label">کاربران فعال</div>
+                    <div class="stat-value">@activeCount</div>
+                </div>
+                <i class="fas fa-user-check fa-lg"></i>
+            </div>
+            <div class="stat-caption">حساب‌های فعال سامانه</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <div class="stat-text">
+                    <div class="stat-label">کاربران قفل</div>
+                    <div class="stat-value">@lockedCount</div>
+                </div>
+                <i class="fas fa-user-lock fa-lg"></i>
+            </div>
+            <div class="stat-caption">حساب‌های دارای محدودیت ورود</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <div class="stat-text">
+                    <div class="stat-label">-</div>
+                    <div class="stat-value">—</div>
+                </div>
+                <i class="fas fa-file-signature fa-lg"></i>
+            </div>
+            <div class="stat-caption">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <div class="stat-text">
+                    <div class="stat-label">-</div>
+                    <div class="stat-value">—</div>
+                </div>
+                <i class="fas fa-shield-halved fa-lg"></i>
+            </div>
+            <div class="stat-caption">-</div>
+        </div>
+
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+
+        <!-- Header (به‌جای .brand p-5؛ همان ساختار brand-icon + brand-text در style.css) -->
+        <div class="page-head">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-users-gear"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>مدیریت کاربران</h1>
+                    <p>مدیریت اطلاعات، نقش‌ها، وضعیت دسترسی و حساب کاربران سامانه</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <input type="search"
+                   id="userSearch"
+                   class="search"
+                   placeholder="جستجو بر اساس نام، نام خانوادگی، نام کاربری یا استان..." />
+
+            <button type="button" class="btn btn-secondary" onclick="clearUserSearch()">
+                <i class="fas fa-rotate-right"></i>
+                پاک کردن
+            </button>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#AddUser">
+                <i class="fas fa-user-plus"></i>
+                کاربر جدید
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th style="width:45px" class="text-center">#</th>
+                        <th>نام و نام خانوادگی</th>
+                        <th>نام کاربری</th>
+                        <th>استان</th>
+                        <th>سازمان</th>
+                        <th>نقش</th>
+                        <th>تاریخ ثبت‌نام</th>
+                        <th style="width:190px" class="text-center">عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in users)
+                    {
+                        var roles = await _UserManager.GetRolesAsync(item);
+                        var isLocked = await _UserManager.IsLockedOutAsync(item);
+                        var isActive = item.EmailConfirmed;
+
+                        <tr data-search="@($"{item.FirstName} {item.LastName} {item.UserName} {item.City}")">
+                            <td class="text-center">@i</td>
+
+                            <td><strong>@item.FirstName @item.LastName</strong></td>
+
+                            <td><span class="meta-chip">@item.UserName</span></td>
+
+                            <td>@(string.IsNullOrWhiteSpace(item.City) ? "—" : item.City)</td>
+
+                            <td><span class="meta-chip">—</span></td>
+
+                            <td>
+                                <div class="meta-chips">
+                                    @if (roles.Any())
+                                    {
+                                        foreach (var role in roles)
+                                        {
+                                            var persianRole = role switch
+                                            {
+                                                "Hefazat" => "حفاظت فناوری اطلاعات",
+                                                "Edari" => "امور قراردادها",
+                                                "Setad" => "ستاد حراست",
+                                                _ => role
+                                            };
+
+                                            <span class="meta-chip tag">@persianRole</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="meta-chip">بدون نقش</span>
+                                    }
+                                </div>
+                            </td>
+
+                            <td>@(item.DateRegister?.Split('-')[0].Trim() ?? "—")</td>
+
+                            <td>
+                                <div class="row-actions">
+                                    @if (isActive)
+                                    {
+                                        <a class="btn btn-success"
+                                           asp-action="Active"
+                                           asp-controller="Accounting"
+                                           asp-route-id="@item.Id"
+                                           title="قفل کردن کاربر">
+                                            <span>🔓</span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-danger"
+                                           asp-action="Active"
+                                           asp-controller="Accounting"
+                                           asp-route-id="@item.Id"
+                                           title="فعال‌سازی کاربر">
+                                            <span>🔒</span>
+                                        </a>
+                                    }
+
+                                    <a class="btn btn-secondary"
+                                       asp-action="ResetPassword"
+                                       asp-controller="Accounting"
+                                       asp-route-id="@item.Id"
+                                       title="تغییر رمز عبور">
+                                        <span>🗝️</span>
+                                    </a>
+
+                                    <a 
+                                            class="btn btn-secondary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#EditUser"
+                                            data-id="@item.Id"
+                                            data-first="@item.FirstName"
+                                            data-last="@item.LastName"
+                                            data-city="@item.City"
+                                            title="ویرایش کاربر">
+                                        <span>✏️</span>
+                                    </a>
+
+                                    @if (isLocked)
+                                    {
+                                        <button type="button" class="btn btn-secondary" disabled title="کاربر قفل است">
+                                            <i class="fa-solid fa-lock"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+
+                    <!-- نتیجه‌ی خالی جستجو -->
+                    <tr id="noResultRow" hidden>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">🔍</div>
+                                <h3>کاربری پیدا نشد</h3>
+                                <p>عبارت جستجو را تغییر دهید یا آن را پاک کنید.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- =========================================================
+     ADD USER MODAL
+========================================================= -->
+<div id="AddUser" class="modal modal-lg">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <div class="header-title-group">
+                <div class="header-icon-badge">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div>
+                    <h3 class="modal-title">ایجاد کاربر جدید</h3>
+                    <div class="modal-header-sub">اطلاعات حساب کاربری و دسترسی‌ها را وارد کنید</div>
+                </div>
+            </div>
+            <button type="button" class="close-btn" onclick="closeCustomModal('AddUser')">&times;</button>
+        </div>
+
+        <form asp-controller="Accounting" asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="modal-body">
+
+                <!-- .image-file-button در style.css فقط داخل .record-image-column استایل می‌گیرد -->
+                <div class="record-image-column">
+                    <div class="record-image-panel">
+                        <div class="image-stage" id="avatarStage">
+                            <i class="fas fa-user image-stage-empty"></i>
+                        </div>
+                        <div class="image-side">
+                            <div class="image-badge is-new">تصویر پروفایل</div>
+                            <div class="image-file-control">
+                                <input type="file" id="userAvatar" name="Avatar" class="image-file-input" accept="image/jpeg,image/png" />
+                                <label for="userAvatar" class="image-file-button">
+                                    <i class="fas fa-camera"></i> انتخاب تصویر
+                                </label>
+                            </div>
+                            <div class="image-file-status" id="avatarStatus">فرمت‌های مجاز: JPG, PNG (حداکثر ۲ مگابایت)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label" for="addFirstName">
+                            <i class="fas fa-signature"></i> نام
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="addFirstName" class="input" name="FirstName" placeholder="مثال: علی" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="addLastName">
+                            <i class="fas fa-signature"></i> نام خانوادگی
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="addLastName" class="input" name="LastName" placeholder="مثال: محمدی" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="addUserName">
+                            <i class="fas fa-at"></i> نام کاربری
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-id-badge input-icon"></i>
+                            <input type="text" id="addUserName" class="input" name="UsernameTemp" placeholder="alimohammadi" autocomplete="username" dir="ltr" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="addPassword">
+                            <i class="fas fa-key"></i> رمز عبور
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="addPassword" class="input" name="PassWordTemp" placeholder="••••••••" autocomplete="new-password" dir="ltr" required />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> ثبت کاربر جدید
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeCustomModal('AddUser')">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- =========================================================
+     EDIT USER MODAL (یک مودال مشترک؛ فیلدها از data-* دکمه پر می‌شوند)
+     توجه: اکشن Accounting/Edit را مطابق کنترلر خودتان تنظیم کنید.
+========================================================= -->
+<div id="EditUser" class="modal modal-lg">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <div class="header-title-group">
+                <div class="header-icon-badge">
+                    <i class="fas fa-user-pen"></i>
+                </div>
+                <div>
+                    <h3 class="modal-title" id="editRecordTitle">ویرایش کاربر</h3>
+                    <div class="modal-header-sub">اطلاعات کاربر را ویرایش کنید</div>
+                </div>
+            </div>
+            <button type="button" class="close-btn" onclick="closeCustomModal('EditUser')">&times;</button>
+        </div>
+
+        <form asp-controller="Accounting" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" id="editId" />
+
+            <div class="modal-body">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label" for="editFirstName">
+                            <i class="fas fa-signature"></i> نام
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="editFirstName" class="input" name="FirstName" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editLastName">
+                            <i class="fas fa-signature"></i> نام خانوادگی
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="editLastName" class="input" name="LastName" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editCity">
+                            <i class="fas fa-location-dot"></i> استان
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-map input-icon"></i>
+                            <input type="text" id="editCity" class="input" name="City" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> ذخیره تغییرات
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeCustomModal('EditUser')">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =========================================================
+     PAGE SCRIPT
+========================================================= -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ---------- Modal helpers ---------- */
+        function openModal(modal) {
+            modal.classList.add('show');
+            modal.style.display = 'flex';
+        }
+
+        window.closeCustomModal = function (id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+            }
+        };
+
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function (button) {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                var modal = document.querySelector(this.getAttribute('data-bs-target'));
+                if (modal) openModal(modal);
+            });
+        });
+
+        document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var modal = this.closest('.modal');
+                if (modal) window.closeCustomModal(modal.id);
+            });
+        });
+
+        // کلیک روی لایه‌ی تاریک
+        window.addEventListener('click', function (e) {
+            if (e.target.classList && e.target.classList.contains('modal')) {
+                window.closeCustomModal(e.target.id);
+            }
+        });
+
+        // کلید Esc
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(function (m) {
+                    window.closeCustomModal(m.id);
+                });
+            }
+        });
+
+        /* ---------- Edit modal: fill from data-* ---------- */
+        document.querySelectorAll('.js-edit-user').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.getElementById('editId').value = this.dataset.id || '';
+                document.getElementById('editFirstName').value = this.dataset.first || '';
+                document.getElementById('editLastName').value = this.dataset.last || '';
+                document.getElementById('editCity').value = this.dataset.city || '';
+            });
+        });
+
+        /* ---------- Search ---------- */
+        var searchInput = document.getElementById('userSearch');
+        var rows = document.querySelectorAll('#userTable tbody tr[data-search]');
+        var noResult = document.getElementById('noResultRow');
+
+        function normalize(s) {
+            return (s || '')
+                .replace(/ي/g, 'ی')
+                .replace(/ك/g, 'ک')
+                .toLowerCase()
+                .trim();
+        }
+
+        function applySearch() {
+            var q = normalize(searchInput.value);
+            var visible = 0;
+            rows.forEach(function (row) {
+                var match = !q || normalize(row.getAttribute('data-search')).indexOf(q) !== -1;
+                row.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            if (noResult) noResult.hidden = visible !== 0;
+        }
+
+        window.clearUserSearch = function () {
+            searchInput.value = '';
+            applySearch();
+            searchInput.focus();
+        };
+
+        searchInput.addEventListener('input', applySearch);
+
+        /* ---------- Avatar preview ---------- */
+        var avatarInput = document.getElementById('userAvatar');
+        var avatarStage = document.getElementById('avatarStage');
+        var avatarStatus = document.getElementById('avatarStatus');
+        var defaultStatus = avatarStatus ? avatarStatus.textContent : '';
+        var emptyIconHtml = avatarStage ? avatarStage.innerHTML : '';
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function () {
+                var file = this.files && this.files[0];
+                if (!file) {
+                    avatarStage.innerHTML = emptyIconHtml;
+                    avatarStatus.textContent = defaultStatus;
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    this.value = '';
+                    avatarStage.innerHTML = emptyIconHtml;
+                    avatarStatus.textContent = 'حجم تصویر بیشتر از ۲ مگابایت است.';
+                    return;
+                }
+                var img = document.createElement('img');
+                img.alt = '';
+                img.src = URL.createObjectURL(file);
+                avatarStage.innerHTML = '';
+                avatarStage.appendChild(img);
+                avatarStatus.textContent = file.name;
+            });
+        }
+
+        /* ---------- Toast ---------- */
+        var toast = document.getElementById('systemToast');
+        if (typeof window.closeToast !== 'function') {
+            window.closeToast = function () {
+                var t = document.getElementById('systemToast');
+                if (t) t.remove();
+            };
+        }
+        if (toast) {
+            var bar = document.getElementById('toastProgress');
+            // اگر CSS پروژه خودش انیمیشن نوار را دارد، دست نمی‌زنیم
+            if (bar && getComputedStyle(bar).animationName === 'none') {
+                bar.style.width = '100%';
+                bar.style.transition = 'width 5s linear';
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () { bar.style.width = '0'; });
+                });
+            }
+            setTimeout(window.closeToast, 5000);
+        }
+    });
+</script>

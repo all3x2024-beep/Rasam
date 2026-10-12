@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Rasam.Models.SocialAccount.Profile>
+
+@{
+    ViewData["Title"] = "پروفایل‌ها";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>پروفایل‌ها</h2>
+
+        <a asp-action="Create" class="btn btn-primary">
+            ایجاد پروفایل جدید
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>شناسه</th>
+                <th>نام کاربری</th>
+                <th>نام</th>
+                <th>نام خانوادگی</th>
+                <th>کد ملی</th>
+                <th>موبایل</th>
+                <th>کشور</th>
+                <th>موضوع</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.UsernameId</td>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.NationalCode</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Country</td>
+                    <td>@item.Topic?.Title</td>
+
+                    <td>
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-info">
+                            جزئیات
+                        </a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-warning">
+                            ویرایش
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-danger">
+                            حذف
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

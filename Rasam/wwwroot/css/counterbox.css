@@ -1,0 +1,74 @@
+﻿
+/* =========================================================
+   Stats
+========================================================= */
+
+.stats {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.stat {
+    position: relative;
+    min-height: 82px;
+    padding: 12px 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: 0 7px 22px var(--shadow-soft);
+}
+
+    .stat::after {
+        content: "";
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        left: -30px;
+        bottom: -35px;
+        border-radius: 50%;
+        background: var(--surface-alt);
+    }
+
+.stat-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 42px;
+}
+
+.stat-text {
+    min-width: 0;
+}
+
+.stat-label {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.stat-value {
+    color: var(--heading);
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.stat-caption {
+    position: relative;
+    z-index: 2;
+    margin-top: 5px;
+    color: var(--muted-2);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

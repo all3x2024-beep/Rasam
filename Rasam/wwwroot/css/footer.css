@@ -1,0 +1,88 @@
+﻿
+/* =========================================================
+   Status Bar
+========================================================= */
+
+.statusbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.statusbar-col {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.statusbar-status {
+    justify-content: flex-start;
+}
+
+.statusbar-clock {
+    justify-content: center;
+    color: var(--text-color);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.statusbar-credit {
+    justify-content: flex-end;
+    color: var(--muted);
+}
+
+.credit-content {
+    width: min(420px, 100%);
+}
+
+.quote-box {
+    position: relative;
+    padding: 22px 20px 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-alt);
+    text-align: center;
+}
+
+.quote-mark {
+    margin-bottom: 4px;
+    color: #2563eb;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.quote-text {
+    margin: 0 0 10px;
+    color: var(--heading);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.9;
+}
+
+.quote-author {
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted-2);
+}
+
+    .status-dot.active {
+        background: #16a34a;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, .09);
+    }

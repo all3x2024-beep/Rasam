@@ -1,0 +1,95 @@
+﻿.app-toast-container-top {
+    position: fixed !important;
+    top: 24px !important;
+    right: 24px !important;
+    z-index: 99999 !important;
+    direction: rtl;
+}
+
+.app-toast {
+    width: 320px;
+    max-width: calc(100vw - 48px);
+    background-color: var(--surface);
+    color: var(--text-color);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+    font-family: 'IRANSansWeb', sans-serif;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+    .app-toast.toast-hide {
+        opacity: 0;
+        transform: translateY(-20px);
+        pointer-events: none;
+    }
+
+.app-toast-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* محفظه و نوار پیشرفت زمان */
+.app-toast-progress-container {
+    width: 100%;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.app-toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    background-color: #3b82f6; /* رنگ آبی متناسب - می‌توانید تغییر دهید */
+    transition: width 0.05s linear;
+}
+
+.app-toast-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-color);
+    margin: 0;
+    flex-grow: 1;
+}
+
+.app-toast-body {
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.btn-close-custom {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--text-color);
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+    .btn-close-custom:hover {
+        opacity: 1;
+    }
+
+html.dark .app-toast {
+    background-color: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .app-toast-progress-container {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .app-toast-progress-bar {
+    background-color: #60a5fa;
+}

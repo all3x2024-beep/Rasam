@@ -1,0 +1,290 @@
+﻿
+/* =========================================================
+   Table / Records
+========================================================= */
+
+.card {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--surface);
+    box-shadow: 0 8px 25px var(--shadow-soft);
+}
+
+.toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+    .toolbar .search {
+        flex: 1 1 auto;
+        width: auto;
+    }
+
+    .toolbar #graphBtn,
+    .toolbar #addRecordBtn,
+    .toolbar #marsadExportBtn {
+        flex: 0 0 auto;
+        height: 46px;
+        white-space: nowrap;
+    }
+
+.search {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    outline: none;
+    color: var(--text-color);
+    background: var(--surface);
+    font-size: 14px;
+    transition: .2s;
+}
+
+    .search:focus {
+        border-color: var(--muted);
+        box-shadow: 0 0 0 3px rgba(100, 116, 139, .08);
+    }
+
+.table-wrap {
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 1200px;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+    th.col-select,
+    td.col-select {
+        width: 34px;
+        padding: 6px 4px !important;
+        text-align: center;
+    }
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+tbody tr {
+    transition: background .15s ease;
+}
+
+    tbody tr.clickable-row {
+        cursor: pointer;
+    }
+
+    tbody tr:hover {
+        background: var(--surface-alt);
+    }
+
+.row-select-checkbox,
+#selectAllRowsCheckbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.quality-cell {
+    min-width: 64px;
+    text-align: center;
+}
+
+.quality-bar-wrap {
+    width: 100%;
+    max-width: 70px;
+    height: 7px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 99px;
+    background: var(--border);
+}
+
+.quality-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width .2s ease;
+}
+
+    .quality-bar-fill.quality-good {
+        background: #16a34a;
+    }
+
+    .quality-bar-fill.quality-mid {
+        background: #d97706;
+    }
+
+    .quality-bar-fill.quality-low {
+        background: #dc2626;
+    }
+
+.profile-image,
+.profile-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+}
+
+.profile-image {
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: .2s;
+    box-shadow: 0 3px 9px rgba(15, 23, 42, .08);
+}
+
+    .profile-image:hover {
+        transform: scale(1.07);
+        border-color: #64748b;
+    }
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--border);
+    color: var(--muted);
+    font-size: 23px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 1px solid #dbeafe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 12px;
+}
+
+.record-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 230px;
+}
+
+.attach-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+    .attach-btn:hover {
+        background: var(--surface-alt);
+        border-color: var(--muted);
+    }
+
+.row-actions {
+    display: flex;
+    gap: 6px;
+}
+
+    .row-actions button {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+        .row-actions button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, .12);
+        }
+
+        .row-actions button:active {
+            transform: translateY(0);
+        }
+
+.edit-btn {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #dbeafe;
+}
+
+    .edit-btn:hover {
+        background: #dbeafe;
+    }
+
+.delete-btn {
+    color: #991b1b;
+    background: #fee2e2;
+    border-color: #fecaca;
+}
+
+    .delete-btn:hover {
+        background: #fecaca;
+    }
+
+
+
+/* =========================================================
+           PROFILE IMAGE
+        ========================================================= */
+
+.profile-avatar {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 30%;
+    border: 2px solid #e2e8f0;
+    display: block;
+    background: #f8fafc;
+}
+
+.profile-avatar-empty {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+

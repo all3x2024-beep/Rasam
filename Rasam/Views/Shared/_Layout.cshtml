@@ -1,0 +1,2767 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('rasam-theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) { }
+        })();
+    </script>
+
+    <title>
+        @ViewData["Title"] - سامانه بانک اطلاعات تصویری رصام
+    </title>
+
+    <link rel="shortcut icon"
+          href="~/favicon.ico"
+          type="image/x-icon" />    
+
+    <link rel="stylesheet"
+          href="~/css/style.css"
+		  asp-append-version="true" />
+
+
+	<link href="~/css/toast.css" rel="stylesheet" />
+	<link href="~/css/graph.css" rel="stylesheet" />
+	<link href="~/css/counterbox.css" rel="stylesheet" />
+	<link href="~/css/table.css" rel="stylesheet" />
+	<link href="~/css/footer.css" rel="stylesheet" />
+	<link href="~/css/modal.css" rel="stylesheet" />
+	<link href="~/css/profile.css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+    <canvas class="app-bg-canvas"
+            id="appBackgroundCanvas">
+    </canvas>
+
+
+    <div class="app-shell">
+
+
+        <!-- Header -->
+
+        <header class="header">
+
+<a asp-controller="Home" asp-action="Index">
+				<div class="brand">
+
+					<div class="brand-icon">
+						🗂️
+					</div>
+
+					<div class="brand-text">
+
+						<h1>
+							سامانه بانک اطلاعات تصویری رصام
+						</h1>
+
+						<p>
+							مدیریت اطلاعات فضای مجازی
+						</p>
+
+					</div>
+
+				</div>
+
+</a>
+   
+
+            <div class="actions">
+
+                <button class="btn btn-toggle"
+                        id="settingsBtn"
+                        type="button"
+                        title="تنظیمات">
+
+                    ⚙️
+
+                </button>
+
+
+                <button class="btn btn-toggle"
+                        id="themeToggleBtn"
+                        type="button"
+                        title="تغییر پوسته"
+                        aria-label="تغییر پوسته">
+
+                    🌙
+
+                </button>
+
+
+                <div class="profile-menu">
+
+                    <button class="btn btn-toggle profile-menu-toggle"
+                            id="profileMenuBtn"
+                            type="button"
+                            title="مدیریت پروفایل"
+                            aria-label="مدیریت پروفایل"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+
+                        👤
+
+                    </button>
+
+                    <div class="profile-submenu"
+                         id="profileSubmenu"
+                         role="menu">
+
+                        <a class="profile-submenu-item"
+                           role="menuitem"
+                           href="@Url.Action("ChangePassword", "Accounting")">
+                            🔑 تغییر رمز
+                        </a>
+
+                        <a class="profile-submenu-item"
+                           role="menuitem"
+                           href="@Url.Action("UserIndex", "Accounting")">
+                            👤 تغییر پروفایل
+                        </a>
+
+                        <a class="profile-submenu-item profile-submenu-danger"
+                           role="menuitem"
+                           href="@Url.Action("LogOut", "Accounting")">
+                            🚪 خروج
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- Main -->
+
+        <main role="main"
+              class="app-main">
+
+            @RenderBody()
+
+        </main>
+
+
+        <!-- Footer -->
+        <footer class="statusbar mt-auto p-2">
+            <div class="statusbar-col statusbar-status">
+
+                <span class="status-dot active"
+                      id="statusDot">
+                </span>
+
+                <span id="statusText">
+                    سامانه آماده به کار است
+                </span>
+
+            </div>
+
+
+            <div class="statusbar-col statusbar-clock"
+                 id="statusbarClock">
+
+                —
+
+            </div>
+
+
+            <div class="statusbar-col statusbar-credit">
+
+                توسعه یافته توسط سرباز گمنام
+
+                </div>
+
+        </footer>
+    </div>
+
+
+    <!-- ================================
+         Settings Modal
+    ================================= -->
+    @Html.AntiForgeryToken()
+
+    <!-- ==============================
+         Settings Modal
+    ================================ -->
+
+    <div class="modal"
+         id="settingsModal">
+
+
+        <div class="modal-content settings-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h3>⚙️ تنظیمات سامانه</h3>
+
+                    <div class="modal-header-sub">
+                        مدیریت موضوعات، تگ‌ها و روابط سامانه
+                    </div>
+                </div>
+
+                <button class="close-btn modalCloseBtn"
+                        type="button">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="settings-tabs"
+                 role="tablist">
+
+                <button class="settings-tab active"
+                        type="button"
+                        role="tab"
+                        aria-selected="true"
+                        data-tab="backup">
+                    💾 پشتیبان‌گیری
+                </button>
+
+                <button class="settings-tab"
+                        type="button"
+                        role="tab"
+                        aria-selected="false"
+                        data-tab="topics">
+                    🗂️ موضوعات <span class="settings-tab-count"></span>
+                </button>
+
+                <button class="settings-tab"
+                        type="button"
+                        role="tab"
+                        aria-selected="false"
+                        data-tab="tags">
+                    🏷️ تگ‌ها <span class="settings-tab-count"></span>
+                </button>
+
+                <button class="settings-tab"
+                        type="button"
+                        role="tab"
+                        aria-selected="false"
+                        data-tab="relations">
+                    🔗 روابط <span class="settings-tab-count"></span>
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+
+                <!-- ==============================
+                     Backup / Restore
+                ================================= -->
+
+                <div class="settings-section is-active" data-tab="backup" role="tabpanel">
+
+                    <div class="settings-section-header">
+
+                        <div>
+
+                            <h4>💾 پشتیبان‌گیری و بازیابی</h4>
+
+                            <p>
+                                از اطلاعات پایگاه داده پشتیبان بگیرید یا اطلاعات قبلی را وارد کنید.
+                                مبنای داده فایل اکسل (DATA.xlsx) است و عکس‌ها در پوشه PHOTO قرار می‌گیرند.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="bk-actions">
+
+                        <button class="btn btn-primary"
+                                id="bkBackupBtn"
+                                type="button">
+                            ⬇️ پشتیبان‌گیری
+                        </button>
+
+                        <button class="btn btn-secondary"
+                                id="bkRestoreBtn"
+                                type="button">
+                            📦 بازیابی
+                        </button>
+
+                    </div>
+
+                    <p class="bk-note">
+                        بازیابی، اطلاعات فعلی را پاک نمی‌کند؛ فقط موارد جدید اضافه می‌شوند
+                        و رکوردهایی که شناسه یا کد ملی‌شان از قبل ثبت شده باشد به‌عنوان تکراری رد می‌شوند.
+                        برای بازیابی، پوشه‌ای شامل فایل اکسل (DATA.xlsx) و پوشه عکس‌ها را انتخاب کنید.
+                    </p>
+
+                    <div class="bk-danger-box">
+
+                        <div>
+                            <strong>حذف همه داده‌ها</strong>
+                            <span>
+                                پروفایل‌ها، روابط، شبکه‌های اجتماعی، تصاویر و موضوعات حذف می‌شوند.
+                                تگ‌ها و انواع رابطه باقی می‌مانند. قبل از ادامه حتماً پشتیبان‌گیری کنید.
+                            </span>
+                        </div>
+
+                        <button class="btn btn-danger"
+                                id="bkDeleteAllBtn"
+                                type="button">
+                            🗑️ حذف کامل بدون بازگشت
+                        </button>
+
+                    </div>
+
+                    <input type="file"
+                           id="bkFolderInput"
+                           webkitdirectory
+                           directory
+                           multiple
+                           hidden />
+
+                </div>
+
+
+                <!-- ==============================
+                     Topics
+                ================================= -->
+
+                <div class="settings-section" data-tab="topics" role="tabpanel">
+
+                    <div class="settings-section-header">
+
+                        <div>
+
+                            <h4>🗂️ موضوعات</h4>
+
+                            <p>
+                                موضوعات قابل انتخاب برای پروفایل‌ها را مدیریت کنید.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tag-create-row">
+
+                        <input id="newTopicInput"
+                               type="text"
+                               placeholder="مثلاً پرونده‌های عمومی، بررسی ویژه..."
+                               autocomplete="off">
+
+                        <button class="btn btn-primary"
+                                id="addTopicBtn"
+                                type="button">
+
+                            ➕ افزودن موضوع
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-tag-list"
+                         id="settingsTopicList">
+                    </div>
+
+
+                    <div class="settings-empty"
+                         id="settingsTopicsEmpty"
+                         style="display:none">
+
+                        هنوز موضوعی تعریف نشده است.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==============================
+                     Tags
+                ================================= -->
+
+                <div class="settings-section" data-tab="tags" role="tabpanel">
+
+                    <div class="settings-section-header">
+
+                        <div>
+
+                            <h4>🏷️ تگ‌ها</h4>
+
+                            <p>
+                                تگ‌های قابل انتخاب هنگام ویرایش پروفایل را تعریف کنید.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tag-create-row">
+
+                        <input id="newTagInput"
+                               type="text"
+                               placeholder="مثلاً مهم، بررسی، ویژه..."
+                               autocomplete="off">
+
+                        <button class="btn btn-primary"
+                                id="addTagBtn"
+                                type="button">
+
+                            ➕ افزودن تگ
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-tag-list"
+                         id="settingsTagList">
+                    </div>
+
+
+                    <div class="settings-empty"
+                         id="settingsTagsEmpty"
+                         style="display:none">
+
+                        هنوز تگی تعریف نشده است.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==============================
+                     Relations
+                ================================= -->
+
+                <div class="settings-section" data-tab="relations" role="tabpanel">
+
+                    <div class="settings-section-header">
+
+                        <div>
+
+                            <h4>🔗 روابط</h4>
+
+                            <p>
+                                انواع ارتباط قابل انتخاب بین پروفایل‌ها را مدیریت کنید.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tag-create-row">
+
+                        <input id="newRelationInput"
+                               type="text"
+                               placeholder="مثلاً مدیر، همکار، وابسته..."
+                               autocomplete="off">
+
+                        <button class="btn btn-primary"
+                                id="addRelationBtn"
+                                type="button">
+
+                            ➕ افزودن رابطه
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="settings-tag-list"
+                         id="settingsRelationList">
+                    </div>
+
+
+                    <div class="settings-empty"
+                         id="settingsRelationsEmpty"
+                         style="display:none">
+
+                        هنوز رابطه‌ای تعریف نشده است.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary modalCloseBtn"
+                        type="button">
+
+                    بستن
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- ==============================
+         Delete Confirmation Modal
+    ================================ -->
+
+    <div class="modal"
+         id="deleteConfirmModal">
+
+
+        <div class="modal-content delete-confirm-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h3>⚠️ تأیید حذف</h3>
+
+                    <div class="modal-header-sub">
+                        حذف این مورد قابل بازگشت نیست.
+                    </div>
+
+                </div>
+
+                <button class="close-btn"
+                        id="deleteConfirmCloseBtn"
+                        type="button">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="delete-confirm-message">
+
+                    <span class="delete-confirm-icon">
+                        🗑️
+                    </span>
+
+                    <div>
+                        آیا از حذف
+                        <strong id="deleteConfirmName"></strong>
+                        مطمئن هستید؟
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        id="deleteCancelBtn"
+                        type="button">
+
+                    انصراف
+
+                </button>
+
+                <button class="btn btn-danger"
+                        id="deleteConfirmBtn"
+                        type="button">
+
+                    🗑️ حذف
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- ==============================
+         Delete ALL data – confirmation modal
+    ================================ -->
+
+    <div class="modal"
+         id="bkDeleteModal">
+
+        <div class="modal-content bk-confirm-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h3>⚠️ حذف همه داده‌ها</h3>
+                    <div class="modal-header-sub">این عملیات قابل بازگشت نیست.</div>
+                </div>
+
+                <button class="close-btn"
+                        id="bkDeleteCloseX"
+                        type="button">
+                    ×
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p class="bk-confirm-text">
+                    همه پروفایل‌ها، روابط، شبکه‌های اجتماعی، تصاویر و موضوعات حذف می‌شوند.
+                    قبل از ادامه از «پشتیبان‌گیری» استفاده کنید.
+                    برای تأیید، کلمه <strong>حذف</strong> را در کادر زیر بنویسید.
+                </p>
+
+                <input class="bk-confirm-input"
+                       id="bkDeleteInput"
+                       type="text"
+                       autocomplete="off"
+                       placeholder="حذف" />
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        id="bkDeleteCancelBtn"
+                        type="button">
+                    انصراف
+                </button>
+
+                <button class="btn btn-danger"
+                        id="bkDeleteConfirmBtn"
+                        type="button"
+                        disabled>
+                    🗑️ حذف کامل
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==============================
+         Backup / Restore progress modal
+    ================================ -->
+
+    <div class="modal"
+         id="bkProgressModal">
+
+        <div class="modal-content bk-progress-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h3 id="bkTitle">💾 پشتیبان‌گیری و بازیابی</h3>
+                    <div class="modal-header-sub" id="bkSub"></div>
+                </div>
+
+                <button class="close-btn"
+                        id="bkCloseX"
+                        type="button"
+                        disabled>
+                    ×
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="bk-bar">
+                    <div class="bk-bar-fill" id="bkBarFill"></div>
+                </div>
+
+                <div class="bk-meta">
+                    <span id="bkStatus"></span>
+                    <span id="bkPct">۰٪</span>
+                </div>
+
+                <div class="bk-result" id="bkResult" hidden></div>
+
+                <div class="bk-log" id="bkLog"></div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-primary"
+                        id="bkReloadBtn"
+                        type="button"
+                        hidden>
+                    🔄 تازه‌سازی صفحه
+                </button>
+
+                <button class="btn btn-secondary"
+                        id="bkCloseBtn"
+                        type="button"
+                        disabled>
+                    بستن
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+    (function () {
+        'use strict';
+        var modal = document.getElementById('settingsModal');
+        if (!modal) return;
+
+        var tabs = Array.prototype.slice.call(modal.querySelectorAll('.settings-tab'));
+        var panels = Array.prototype.slice.call(modal.querySelectorAll('.settings-section[data-tab]'));
+
+        function activate(name) {
+            tabs.forEach(function (t) {
+                var on = t.getAttribute('data-tab') === name;
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            panels.forEach(function (p) {
+                p.classList.toggle('is-active', p.getAttribute('data-tab') === name);
+            });
+        }
+
+        tabs.forEach(function (t) {
+            t.addEventListener('click', function () { activate(t.getAttribute('data-tab')); });
+        });
+
+        // item counters on the tabs
+        [['settingsTopicList', 'topics'], ['settingsTagList', 'tags'], ['settingsRelationList', 'relations']].forEach(function (pair) {
+            var list = document.getElementById(pair[0]);
+            var badge = modal.querySelector('.settings-tab[data-tab="' + pair[1] + '"] .settings-tab-count');
+            if (!list || !badge) return;
+
+            function update() {
+                var n = list.querySelectorAll('.settings-tag-item').length;
+                badge.textContent = n ? n.toLocaleString('fa-IR') : '';
+            }
+            new MutationObserver(update).observe(list, { childList: true, subtree: true });
+            update();
+        });
+    })();
+    </script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            console.log('Rasam Metadata JS loaded');
+
+
+            // =====================================================
+            // Elements
+            // =====================================================
+
+            const themeToggleBtn =
+                document.getElementById('themeToggleBtn');
+
+            const profileMenuBtn =
+                document.getElementById('profileMenuBtn');
+
+            const profileSubmenu =
+                document.getElementById('profileSubmenu');
+
+
+            // =====================================================
+            // Theme Toggle
+            // =====================================================
+
+            function applyTheme(isDark) {
+
+                document.documentElement.classList.toggle('dark', isDark);
+
+                if (themeToggleBtn) {
+                    themeToggleBtn.textContent = isDark ? '☀️' : '🌙';
+                    themeToggleBtn.setAttribute(
+                        'aria-label',
+                        isDark ? 'تغییر به پوسته روشن' : 'تغییر به پوسته تیره'
+                    );
+                    themeToggleBtn.title = isDark ? 'پوسته روشن' : 'پوسته تیره';
+                }
+
+            }
+
+            const savedTheme = localStorage.getItem('rasam-theme');
+            applyTheme(savedTheme === 'dark');
+
+            if (themeToggleBtn) {
+
+                themeToggleBtn.addEventListener('click', function () {
+
+                    const isDark =
+                        !document.documentElement.classList.contains('dark');
+
+                    applyTheme(isDark);
+                    localStorage.setItem(
+                        'rasam-theme',
+                        isDark ? 'dark' : 'light'
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Profile Menu
+            // =====================================================
+
+            if (profileMenuBtn && profileSubmenu) {
+
+                profileMenuBtn.addEventListener('click', function (event) {
+
+                    event.stopPropagation();
+
+                    const isOpen = profileSubmenu.classList.toggle('show');
+                    profileMenuBtn.setAttribute(
+                        'aria-expanded',
+                        isOpen ? 'true' : 'false'
+                    );
+
+                });
+
+                document.addEventListener('click', function () {
+
+                    profileSubmenu.classList.remove('show');
+                    profileMenuBtn.setAttribute('aria-expanded', 'false');
+
+                });
+
+                document.addEventListener('keydown', function (event) {
+
+                    if (event.key === 'Escape') {
+                        profileSubmenu.classList.remove('show');
+                        profileMenuBtn.setAttribute('aria-expanded', 'false');
+                    }
+
+                });
+
+            }
+
+
+            const settingsBtn =
+                document.getElementById('settingsBtn');
+
+            const settingsModal =
+                document.getElementById('settingsModal');
+
+            const deleteConfirmModal =
+                document.getElementById('deleteConfirmModal');
+
+            const deleteConfirmName =
+                document.getElementById('deleteConfirmName');
+
+            const deleteConfirmBtn =
+                document.getElementById('deleteConfirmBtn');
+
+            const deleteCancelBtn =
+                document.getElementById('deleteCancelBtn');
+
+            const deleteConfirmCloseBtn =
+                document.getElementById('deleteConfirmCloseBtn');
+
+
+            let pendingDelete = null;
+
+
+            // =====================================================
+            // Settings Modal
+            // =====================================================
+
+            if (settingsBtn && settingsModal) {
+
+                settingsBtn.addEventListener('click', function () {
+
+                    settingsModal.classList.add('show');
+
+                    loadTopics();
+                    loadTags();
+                    loadRelations();
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Close Main Modal
+            // =====================================================
+
+            document
+                .querySelectorAll('.modalCloseBtn')
+                .forEach(function (button) {
+
+                    button.addEventListener('click', function () {
+
+                        const modal =
+                            button.closest('.modal');
+
+                        if (modal) {
+                            modal.classList.remove('show');
+                        }
+
+                    });
+
+                });
+
+
+            // =====================================================
+            // Close Delete Modal
+            // =====================================================
+
+            function closeDeleteModal() {
+
+                if (deleteConfirmModal) {
+                    deleteConfirmModal.classList.remove('show');
+                }
+
+                pendingDelete = null;
+
+            }
+
+
+            deleteCancelBtn?.addEventListener(
+                'click',
+                closeDeleteModal
+            );
+
+
+            deleteConfirmCloseBtn?.addEventListener(
+                'click',
+                closeDeleteModal
+            );
+
+
+            // =====================================================
+            // Outside Modal Click
+            // =====================================================
+
+            window.addEventListener('click', function (event) {
+
+                if (event.target.classList.contains('modal')) {
+
+                    event.target.classList.remove('show');
+
+                    if (event.target === deleteConfirmModal) {
+                        pendingDelete = null;
+                    }
+
+                }
+
+            });
+
+
+            // =====================================================
+            // Escape
+            // =====================================================
+
+            window.addEventListener('keydown', function (event) {
+
+                if (event.key !== 'Escape') {
+                    return;
+                }
+
+
+                const modal =
+                    document.querySelector('.modal.show');
+
+
+                if (!modal) {
+                    return;
+                }
+
+
+                modal.classList.remove('show');
+
+                if (modal === deleteConfirmModal) {
+                    pendingDelete = null;
+                }
+
+            });
+
+
+            // =====================================================
+            // Add Topic
+            // =====================================================
+
+            document
+                .getElementById('addTopicBtn')
+                ?.addEventListener('click', addTopic);
+
+
+            document
+                .getElementById('newTopicInput')
+                ?.addEventListener('keydown', function (event) {
+
+                    if (event.key === 'Enter') {
+
+                        event.preventDefault();
+
+                        addTopic();
+
+                    }
+
+                });
+
+
+            // =====================================================
+            // Add Tag
+            // =====================================================
+
+            document
+                .getElementById('addTagBtn')
+                ?.addEventListener('click', addTag);
+
+
+            document
+                .getElementById('newTagInput')
+                ?.addEventListener('keydown', function (event) {
+
+                    if (event.key === 'Enter') {
+
+                        event.preventDefault();
+
+                        addTag();
+
+                    }
+
+                });
+
+
+            // =====================================================
+            // Add Relation
+            // =====================================================
+
+            document
+                .getElementById('addRelationBtn')
+                ?.addEventListener('click', addRelation);
+
+
+            document
+                .getElementById('newRelationInput')
+                ?.addEventListener('keydown', function (event) {
+
+                    if (event.key === 'Enter') {
+
+                        event.preventDefault();
+
+                        addRelation();
+
+                    }
+
+                });
+
+
+            // =====================================================
+            // Delete Confirmation
+            // =====================================================
+
+            deleteConfirmBtn?.addEventListener(
+                'click',
+                async function () {
+
+                    if (!pendingDelete) {
+                        return;
+                    }
+
+
+                    const action =
+                        pendingDelete;
+
+
+                    deleteConfirmBtn.disabled = true;
+
+
+                    try {
+
+                        await action();
+
+                    }
+                    finally {
+
+                        deleteConfirmBtn.disabled = false;
+
+                        closeDeleteModal();
+
+                    }
+
+                }
+            );
+
+
+            // =====================================================
+            // Anti Forgery
+            // =====================================================
+
+            window.getAntiForgeryToken = function () {
+
+                const input =
+                    document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    );
+
+                return input ? input.value : '';
+
+            };
+
+
+            // =====================================================
+            // Open Delete Modal
+            // =====================================================
+
+            window.openDeleteConfirm = function (
+                name,
+                deleteFunction
+            ) {
+
+                pendingDelete = deleteFunction;
+
+
+                if (deleteConfirmName) {
+                    deleteConfirmName.textContent =
+                        `"${name}"`;
+                }
+
+
+                if (deleteConfirmModal) {
+                    deleteConfirmModal.classList.add('show');
+                }
+
+            };
+
+
+        });
+
+
+        // =========================================================
+        // Helper: Parse Response
+        // =========================================================
+
+        function notifyMetadataChanged(kind) {
+
+            document.dispatchEvent(
+                new CustomEvent('metadata:changed', { detail: { kind: kind } })
+            );
+
+        }
+
+
+        async function parseResponse(response) {
+
+            const text =
+                await response.text();
+
+
+            try {
+
+                return JSON.parse(text);
+
+            }
+            catch {
+
+                return {
+                    success: false,
+                    message: text || 'خطای نامشخص از سرور.'
+                };
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Load Topics
+        // =========================================================
+
+        async function loadTopics() {
+
+            try {
+
+                const response =
+                    await fetch('/MetaData/GetTopics', {
+                        cache: 'no-store'
+                    });
+
+
+                if (!response.ok) {
+                    console.error(
+                        'GetTopics failed:',
+                        response.status
+                    );
+                    return;
+                }
+
+
+                const topics =
+                    await response.json();
+
+
+                const list =
+                    document.getElementById(
+                        'settingsTopicList'
+                    );
+
+                const empty =
+                    document.getElementById(
+                        'settingsTopicsEmpty'
+                    );
+
+
+                if (!list || !empty) {
+                    return;
+                }
+
+
+                list.innerHTML = '';
+
+
+                if (!Array.isArray(topics) || topics.length === 0) {
+
+                    empty.style.display = 'block';
+
+                    return;
+
+                }
+
+
+                empty.style.display = 'none';
+
+
+                topics.forEach(function (topic) {
+
+                    const item =
+                        document.createElement('div');
+
+                    item.className =
+                        'settings-tag-item';
+
+
+                    const title =
+                        document.createElement('span');
+
+                    title.className =
+                        'settings-item-title';
+
+                    title.textContent =
+                        topic.title;
+
+
+                    const deleteButton =
+                        document.createElement('button');
+
+                    deleteButton.type = 'button';
+
+                    deleteButton.className =
+                        'settings-delete-btn';
+
+                    deleteButton.innerHTML =
+                        '×';
+
+                    deleteButton.title =
+                        'حذف';
+
+
+                    deleteButton.addEventListener(
+                        'click',
+                        function () {
+
+                            openDeleteConfirm(
+                                topic.title,
+                                function () {
+                                    return deleteTopic(topic.id);
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    item.appendChild(title);
+                    item.appendChild(deleteButton);
+
+                    list.appendChild(item);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    'GetTopics error:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Load Tags
+        // =========================================================
+
+        async function loadTags() {
+
+            try {
+
+                const response =
+                    await fetch('/MetaData/GetTags', {
+                        cache: 'no-store'
+                    });
+
+
+                if (!response.ok) {
+                    console.error(
+                        'GetTags failed:',
+                        response.status
+                    );
+                    return;
+                }
+
+
+                const tags =
+                    await response.json();
+
+
+                const list =
+                    document.getElementById(
+                        'settingsTagList'
+                    );
+
+                const empty =
+                    document.getElementById(
+                        'settingsTagsEmpty'
+                    );
+
+
+                if (!list || !empty) {
+                    return;
+                }
+
+
+                list.innerHTML = '';
+
+
+                if (!Array.isArray(tags) || tags.length === 0) {
+
+                    empty.style.display = 'block';
+
+                    return;
+
+                }
+
+
+                empty.style.display = 'none';
+
+
+                tags.forEach(function (tag) {
+
+                    const item =
+                        document.createElement('div');
+
+                    item.className =
+                        'settings-tag-item';
+
+
+                    const title =
+                        document.createElement('span');
+
+                    title.className =
+                        'settings-item-title';
+
+                    title.textContent =
+                        tag.title;
+
+
+                    const deleteButton =
+                        document.createElement('button');
+
+                    deleteButton.type = 'button';
+
+                    deleteButton.className =
+                        'settings-delete-btn';
+
+                    deleteButton.innerHTML =
+                        '×';
+
+                    deleteButton.title =
+                        'حذف';
+
+
+                    deleteButton.addEventListener(
+                        'click',
+                        function () {
+
+                            openDeleteConfirm(
+                                tag.title,
+                                function () {
+                                    return deleteTag(tag.id);
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    item.appendChild(title);
+                    item.appendChild(deleteButton);
+
+                    list.appendChild(item);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    'GetTags error:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Load Relations
+        // =========================================================
+
+        async function loadRelations() {
+
+            try {
+
+                const response =
+                    await fetch('/MetaData/GetRelations', {
+                        cache: 'no-store'
+                    });
+
+
+                console.log(
+                    'GetRelations:',
+                    response.status
+                );
+
+
+                if (!response.ok) {
+
+                    console.error(
+                        'GetRelations failed:',
+                        response.status
+                    );
+
+                    return;
+
+                }
+
+
+                const relations =
+                    await response.json();
+
+
+                console.log(
+                    'Relations:',
+                    relations
+                );
+
+
+                const list =
+                    document.getElementById(
+                        'settingsRelationList'
+                    );
+
+                const empty =
+                    document.getElementById(
+                        'settingsRelationsEmpty'
+                    );
+
+
+                if (!list || !empty) {
+                    return;
+                }
+
+
+                list.innerHTML = '';
+
+
+                if (
+                    !Array.isArray(relations) ||
+                    relations.length === 0
+                ) {
+
+                    empty.style.display = 'block';
+
+                    return;
+
+                }
+
+
+                empty.style.display = 'none';
+
+
+                relations.forEach(function (relation) {
+
+                    const item =
+                        document.createElement('div');
+
+                    item.className =
+                        'settings-tag-item';
+
+
+                    const title =
+                        document.createElement('span');
+
+                    title.className =
+                        'settings-item-title';
+
+                    title.textContent =
+                        relation.type || 'بدون عنوان';
+
+
+                    const deleteButton =
+                        document.createElement('button');
+
+                    deleteButton.type = 'button';
+
+                    deleteButton.className =
+                        'settings-delete-btn';
+
+                    deleteButton.innerHTML =
+                        '×';
+
+                    deleteButton.title =
+                        'حذف';
+
+
+                    deleteButton.addEventListener(
+                        'click',
+                        function () {
+
+                            openDeleteConfirm(
+                                relation.type,
+                                function () {
+                                    return deleteRelation(
+                                        relation.id
+                                    );
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    item.appendChild(title);
+                    item.appendChild(deleteButton);
+
+                    list.appendChild(item);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(
+                    'GetRelations error:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Add Topic
+        // =========================================================
+
+        async function addTopic() {
+
+            const input =
+                document.getElementById(
+                    'newTopicInput'
+                );
+
+
+            if (!input) {
+                return;
+            }
+
+
+            const title =
+                input.value.trim();
+
+
+            if (!title) {
+
+                alert('عنوان موضوع را وارد کنید.');
+
+                input.focus();
+
+                return;
+
+            }
+
+
+            const formData =
+                new FormData();
+
+            formData.append('title', title);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/CreateTopic',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'افزودن موضوع انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                input.value = '';
+
+                await loadTopics();
+
+                notifyMetadataChanged('topic');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'CreateTopic error:',
+                    error
+                );
+
+                alert('خطا در ارتباط با سرور.');
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Add Tag
+        // =========================================================
+
+        async function addTag() {
+
+            const input =
+                document.getElementById(
+                    'newTagInput'
+                );
+
+
+            if (!input) {
+                return;
+            }
+
+
+            const title =
+                input.value.trim();
+
+
+            if (!title) {
+
+                alert('عنوان تگ را وارد کنید.');
+
+                input.focus();
+
+                return;
+
+            }
+
+
+            const formData =
+                new FormData();
+
+            formData.append('title', title);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/CreateTag',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'افزودن تگ انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                input.value = '';
+
+                await loadTags();
+
+                notifyMetadataChanged('tag');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'CreateTag error:',
+                    error
+                );
+
+                alert('خطا در ارتباط با سرور.');
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Add Relation
+        // =========================================================
+
+        async function addRelation() {
+
+            const input =
+                document.getElementById(
+                    'newRelationInput'
+                );
+
+
+            if (!input) {
+                return;
+            }
+
+
+            const type =
+                input.value.trim();
+
+
+            if (!type) {
+
+                alert('نوع ارتباط را وارد کنید.');
+
+                input.focus();
+
+                return;
+
+            }
+
+
+            const formData =
+                new FormData();
+
+            formData.append('type', type);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/CreateRelation',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'افزودن رابطه انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                input.value = '';
+
+                await loadRelations();
+
+                notifyMetadataChanged('relation');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'CreateRelation error:',
+                    error
+                );
+
+                alert('خطا در ارتباط با سرور.');
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Delete Topic
+        // =========================================================
+
+        async function deleteTopic(id) {
+
+            const formData =
+                new FormData();
+
+            formData.append('id', id);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/DeleteTopic',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'حذف موضوع انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                await loadTopics();
+
+                notifyMetadataChanged('topic');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'DeleteTopic error:',
+                    error
+                );
+
+                alert('خطا در حذف موضوع.');
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Delete Tag
+        // =========================================================
+
+        async function deleteTag(id) {
+
+            const formData =
+                new FormData();
+
+            formData.append('id', id);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/DeleteTag',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'حذف تگ انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                await loadTags();
+
+                notifyMetadataChanged('tag');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'DeleteTag error:',
+                    error
+                );
+
+                alert('خطا در حذف تگ.');
+
+            }
+
+        }
+
+
+        // =========================================================
+        // Delete Relation
+        // =========================================================
+
+        async function deleteRelation(id) {
+
+            const formData =
+                new FormData();
+
+            formData.append('id', id);
+
+            formData.append(
+                '__RequestVerificationToken',
+                getAntiForgeryToken()
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/MetaData/DeleteRelation',
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await parseResponse(response);
+
+
+                if (!response.ok || !result.success) {
+
+                    alert(
+                        result.message ||
+                        'حذف رابطه انجام نشد.'
+                    );
+
+                    return;
+
+                }
+
+
+                await loadRelations();
+
+                notifyMetadataChanged('relation');
+
+            }
+            catch (error) {
+
+                console.error(
+                    'DeleteRelation error:',
+                    error
+                );
+
+                alert('خطا در حذف رابطه.');
+
+            }
+
+        }
+
+    </script>
+
+	<script src="~/js/toast.js"></script>
+
+    <script src="~/js/xlsx.full.min.js"></script>
+
+
+    <!-- ==============================================================
+         Backup / Restore  (Excel is the only data format)
+         Requires: ~/js/xlsx_full_min.js  +  BackupController endpoints
+    =============================================================== -->
+    <script>
+    (function () {
+        'use strict';
+
+        // ---------------------------------------------------------
+        // Config  (adjust here if your routes / ID format differ)
+        // ---------------------------------------------------------
+        var CFG = {
+            exportUrl: '/Backup/ExportData',
+            metaUrl: '/Backup/ImportMeta',
+            profileUrl: '/Backup/ImportProfile',
+            relationsUrl: '/Backup/ImportRelations',
+            idPrefix: '@@',     
+            deleteAllUrl: '/Backup/DeleteAllData'
+        };
+
+        var busy = false;
+        function $(id) { return document.getElementById(id); }
+
+        // ---------------------------------------------------------
+        // Small helpers
+        // ---------------------------------------------------------
+        function txt(v) { return v === null || v === undefined ? '' : String(v).trim(); }
+
+        function latinDigits(s) {
+            return String(s || '')
+                .replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); })
+                .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); });
+        }
+
+        function nationalKey(v) {
+            var d = latinDigits(txt(v)).replace(/\D/g, '');
+            return /^\d{10}$/.test(d) ? d : '';
+        }
+
+        function normId(v) {
+            var s = txt(v);
+            if (!s) return '';
+            return s.charAt(0) === CFG.idPrefix ? s : CFG.idPrefix + s;
+        }
+
+        function stripPrefix(v) {
+            var s = txt(v);
+            return CFG.idPrefix && s.indexOf(CFG.idPrefix) === 0 ? s.slice(CFG.idPrefix.length) : s;
+        }
+
+        function splitName(full) {
+            var parts = txt(full).split(/\s+/).filter(Boolean);
+            return { first: parts.shift() || '', last: parts.join(' ') };
+        }
+
+        function safeName(v) {
+            return (String(v || 'file').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim().slice(0, 120)) || 'file';
+        }
+
+        function extOf(name, mime) {
+            var m = /\.([a-z0-9]{1,8})$/i.exec(String(name || ''));
+            if (m) return '.' + m[1].toLowerCase();
+            var map = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif', 'image/bmp': '.bmp' };
+            return map[mime] || '.bin';
+        }
+
+        function dayStamp() {
+            try {
+                var parts = new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-latn', {
+                    year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Tehran'
+                }).formatToParts(new Date());
+                var g = function (t) { return (parts.filter(function (p) { return p.type === t; })[0] || {}).value || ''; };
+                return g('year') + '.' + g('month') + '.' + g('day');
+            } catch (e) {
+                var d = new Date();
+                return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
+            }
+        }
+
+        function toast(message, type, title) {
+            try { if (typeof window.showToast === 'function') window.showToast(message, type || 'info', title || ''); } catch (e) { }
+        }
+
+        function requireXlsx() {
+            if (typeof XLSX === 'undefined') {
+                throw new Error('کتابخانه Excel بارگذاری نشده است. فایل js/xlsx_full_min.js را بررسی کنید.');
+            }
+        }
+
+        // ---------------------------------------------------------
+        // Tiny ZIP writer (store, no compression) – for backup output
+        // ---------------------------------------------------------
+        var crcTable = (function () {
+            var t = new Uint32Array(256);
+            for (var n = 0; n < 256; n++) {
+                var c = n;
+                for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                t[n] = c >>> 0;
+            }
+            return t;
+        })();
+
+        function crc32(data) {
+            var c = 0xFFFFFFFF;
+            for (var i = 0; i < data.length; i++) c = crcTable[(c ^ data[i]) & 255] ^ (c >>> 8);
+            return (c ^ 0xFFFFFFFF) >>> 0;
+        }
+        function u16(v) { return new Uint8Array([v & 255, (v >>> 8) & 255]); }
+        function u32(v) { return new Uint8Array([v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]); }
+        function concat(parts) {
+            var total = 0, i;
+            for (i = 0; i < parts.length; i++) total += parts[i].length;
+            var out = new Uint8Array(total), o = 0;
+            for (i = 0; i < parts.length; i++) { out.set(parts[i], o); o += parts[i].length; }
+            return out;
+        }
+        function zipStore(entries) {
+            var enc = new TextEncoder(), local = [], central = [], offset = 0;
+            entries.forEach(function (e) {
+                var name = enc.encode(e.name);
+                var data = e.data instanceof Uint8Array ? e.data : new Uint8Array(e.data);
+                var crc = crc32(data);
+                var header = concat([new Uint8Array([0x50, 0x4b, 0x03, 0x04]), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+                    u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), name]);
+                local.push(header, data);
+                central.push(concat([new Uint8Array([0x50, 0x4b, 0x01, 0x02]), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+                    u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset), name]));
+                offset += header.length + data.length;
+            });
+            var cBytes = concat(central), lBytes = concat(local);
+            var end = concat([new Uint8Array([0x50, 0x4b, 0x05, 0x06]), u16(0), u16(0), u16(entries.length), u16(entries.length),
+                u32(cBytes.length), u32(lBytes.length), u16(0)]);
+            return concat([lBytes, cBytes, end]);
+        }
+
+        // ---------------------------------------------------------
+        // Progress modal
+        // ---------------------------------------------------------
+        function openProgress(title, sub) {
+            busy = true;
+            $('bkTitle').textContent = title;
+            $('bkSub').textContent = sub || '';
+            $('bkLog').innerHTML = '';
+            $('bkResult').hidden = true;
+            $('bkResult').innerHTML = '';
+            $('bkReloadBtn').hidden = true;
+            $('bkCloseBtn').disabled = true;
+            $('bkCloseX').disabled = true;
+            setPct(0, 'در حال شروع...');
+            var st = $('settingsModal');
+            if (st) st.classList.remove('show');
+            $('bkProgressModal').classList.add('show');
+            setButtons(true);
+        }
+
+        function setPct(p, msg) {
+            p = Math.max(0, Math.min(100, Math.round(p)));
+            $('bkBarFill').style.width = p + '%';
+            $('bkPct').textContent = p.toLocaleString('fa-IR') + '٪';
+            if (msg) $('bkStatus').textContent = msg;
+        }
+
+        function addLog(msg, type) {
+            var box = $('bkLog');
+            var line = document.createElement('div');
+            line.className = type || 'info';
+            line.textContent = msg;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function closeProgress() {
+            busy = false;
+            $('bkCloseBtn').disabled = false;
+            $('bkCloseX').disabled = false;
+            setButtons(false);
+        }
+
+        function setButtons(disabled) {
+            ['bkBackupBtn', 'bkRestoreBtn', 'bkDeleteAllBtn'].forEach(function (id) {
+                var el = $(id); if (el) el.disabled = disabled;
+            });
+        }
+
+        function showResult(lines) {
+            var box = $('bkResult');
+            box.innerHTML = '';
+            lines.forEach(function (l) {
+                var d = document.createElement('div');
+                d.textContent = l;
+                box.appendChild(d);
+            });
+            box.hidden = false;
+        }
+
+        // ---------------------------------------------------------
+        // Network helpers
+        // ---------------------------------------------------------
+        async function postForm(url, fields, files) {
+            var fd = new FormData();
+            Object.keys(fields).forEach(function (k) { fd.append(k, fields[k]); });
+            (files || []).forEach(function (f) { fd.append('photos', f, f.name); });
+            fd.append('__RequestVerificationToken', typeof window.getAntiForgeryToken === 'function' ? window.getAntiForgeryToken() : '');
+            var response = await fetch(url, { method: 'POST', body: fd });
+            var text = await response.text();
+            var json;
+            try { json = JSON.parse(text); }
+            catch (e) { json = { success: false, message: text || 'خطای نامشخص از سرور.' }; }
+            if (!response.ok && json.success !== false) json.success = false;
+            return json;
+        }
+
+        // =========================================================
+        // BACKUP  →  ZIP { DATA.xlsx , PHOTO/* }
+        // =========================================================
+        async function runBackup() {
+            if (busy) return;
+            try {
+                openProgress('⬇️ پشتیبان‌گیری', 'خروجی: DATA.xlsx + پوشه PHOTO (ZIP)');
+                requireXlsx();
+                setPct(5, 'دریافت اطلاعات از سرور...');
+
+                var response = await fetch(CFG.exportUrl, { cache: 'no-store' });
+                if (!response.ok) throw new Error('دریافت اطلاعات از سرور ناموفق بود (' + response.status + ').');
+                var data = await response.json();
+
+                var topics = data.topics || [], tags = data.tags || [], relTypes = data.relationTypes || [];
+                var profiles = data.profiles || [], relations = data.relations || [];
+                var socials = data.socialLinks || [], photos = data.photos || [];
+
+                if (data.missingImages) addLog(Number(data.missingImages).toLocaleString('fa-IR') + ' تصویر روی سرور پیدا نشد و در پشتیبان نیامد.', 'warning');
+                addLog(profiles.length.toLocaleString('fa-IR') + ' پروفایل، ' + relations.length.toLocaleString('fa-IR') + ' رابطه، ' +
+                    photos.length.toLocaleString('fa-IR') + ' فایل پیوست.', 'info');
+
+                // ---- sheets (Topics / IDs / Photos / Relations / ...) ----
+                var topicMap = {};
+                var topicsRows = topics.map(function (t, i) {
+                    var id = 'topic_export_' + i;
+                    topicMap[txt(t.title)] = id;
+                    return { topic_id: id, name: txt(t.title), description: '', created_at: '' };
+                });
+
+                var idsRows = profiles.map(function (p) {
+                    var uid = txt(p.usernameId);
+                    var full = (txt(p.firstName) + ' ' + txt(p.lastName)).trim();
+                    return {
+                        id: uid,
+                        social_id: stripPrefix(uid),
+                        name: full,
+                        topic_id: topicMap[txt(p.topic)] || '',
+                        topic_name: txt(p.topic),
+                        notes: p.notes || '',
+                        created_at: p.createdAt || '',
+                        modified_at: p.modifiedAt || '',
+                        pid: p.pid || '',
+                        first_name: txt(p.firstName),
+                        last_name: txt(p.lastName),
+                        national_id: txt(p.nationalCode),
+                        mobile: txt(p.mobile),
+                        country: txt(p.country),
+                        tags: Array.isArray(p.tags) ? p.tags.join('، ') : txt(p.tags),
+                        created_by: txt(p.createdBy),
+                        modified_by: txt(p.modifiedBy)
+                    };
+                });
+
+                var relationsRows = relations.map(function (r, i) {
+                    return {
+                        relation_id: r.id || ('rel_export_' + i),
+                        from_id: txt(r.fromId), from_social_id: stripPrefix(r.fromId),
+                        to_id: txt(r.toId), to_social_id: stripPrefix(r.toId),
+                        relation_type_id: '', relation_type: txt(r.type), created_at: r.createdAt || ''
+                    };
+                });
+
+                var typeNames = {};
+                relTypes.forEach(function (t) { var n = txt(t.type || t.title || t.name); if (n) typeNames[n] = 1; });
+                relations.forEach(function (r) { var n = txt(r.type); if (n) typeNames[n] = 1; });
+                var relationTypesRows = Object.keys(typeNames).map(function (n, i) { return { relation_type_id: 'rtype_export_' + i, name: n }; });
+
+                var tagsRows = tags.map(function (t, i) { return { tag_id: 'tag_export_' + i, name: txt(t.title) }; });
+
+                var socialRows = socials.map(function (s, i) {
+                    return {
+                        social_link_id: s.id || ('social_export_' + i),
+                        id: txt(s.profileId), social_id: stripPrefix(s.profileId),
+                        platform: txt(s.platform), value: txt(s.value), created_at: s.createdAt || ''
+                    };
+                });
+
+                // ---- photos ----
+                var files = [], photosRows = [], used = {}, missing = 0;
+                for (var i = 0; i < photos.length; i++) {
+                    var ph = photos[i];
+                    setPct(10 + (i / Math.max(1, photos.length)) * 70, 'دریافت پیوست‌ها (' + (i + 1).toLocaleString('fa-IR') + ' از ' + photos.length.toLocaleString('fa-IR') + ')');
+                    try {
+                        var res = await fetch(ph.url, { cache: 'no-store' });
+                        if (!res.ok) throw new Error(String(res.status));
+                        var blob = await res.blob();
+                        var base = safeName(stripPrefix(ph.profileId) || 'record');
+                        var ext = extOf(ph.originalName || ph.fileName, blob.type);
+                        var fname = base + '_' + (i + 1) + ext, n = 1;
+                        while (used[fname.toLowerCase()]) fname = base + '_' + (i + 1) + '_' + (n++) + ext;
+                        used[fname.toLowerCase()] = 1;
+                        files.push({ name: 'PHOTO/' + fname, data: new Uint8Array(await blob.arrayBuffer()) });
+                        photosRows.push({
+                            photo_id: ph.id || ('photo_export_' + i), id: txt(ph.profileId), social_id: stripPrefix(ph.profileId),
+                            filename: fname, original_name: ph.originalName || ph.fileName || fname,
+                            mime_type: blob.type || 'application/octet-stream', created_at: ph.createdAt || ''
+                        });
+                    } catch (e) {
+                        missing++;
+                        addLog('پیوست «' + (ph.fileName || ph.id) + '» دریافت نشد و در پشتیبان نیامد.', 'warning');
+                    }
+                }
+
+                setPct(85, 'ساخت DATA.xlsx...');
+                var wb = XLSX.utils.book_new();
+                function add(rows, name, headers) {
+                    var ws = rows.length ? XLSX.utils.json_to_sheet(rows) : XLSX.utils.aoa_to_sheet([headers]);
+                    XLSX.utils.book_append_sheet(wb, ws, name);
+                }
+                add(topicsRows, 'Topics', ['topic_id', 'name', 'description', 'created_at']);
+                add(idsRows, 'IDs', ['id', 'social_id', 'name', 'topic_id', 'topic_name', 'notes', 'created_at', 'modified_at', 'pid', 'first_name', 'last_name', 'national_id', 'mobile', 'country', 'tags', 'created_by', 'modified_by']);
+                add(photosRows, 'Photos', ['photo_id', 'id', 'social_id', 'filename', 'original_name', 'mime_type', 'created_at']);
+                add(relationsRows, 'Relations', ['relation_id', 'from_id', 'from_social_id', 'to_id', 'to_social_id', 'relation_type_id', 'relation_type', 'created_at']);
+                add(relationTypesRows, 'RelationTypes', ['relation_type_id', 'name']);
+                add(socialRows, 'SocialLinks', ['social_link_id', 'id', 'social_id', 'platform', 'value', 'created_at']);
+                add(tagsRows, 'Tags', ['tag_id', 'name']);
+
+                files.unshift({ name: 'DATA.xlsx', data: new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array' })) });
+
+                setPct(92, 'ساخت فایل ZIP...');
+                var zip = zipStore(files);
+                var url = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'پشتیبان رصام - ' + dayStamp() + '.zip';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+
+                setPct(100, 'پشتیبان آماده شد');
+                showResult([
+                    'پروفایل: ' + idsRows.length.toLocaleString('fa-IR'),
+                    'رابطه: ' + relationsRows.length.toLocaleString('fa-IR'),
+                    'پیوست در PHOTO: ' + photosRows.length.toLocaleString('fa-IR') + (missing ? ' (ناموفق: ' + missing.toLocaleString('fa-IR') + ')' : '')
+                ]);
+                toast('پشتیبان با موفقیت دانلود شد.', 'success', 'پشتیبان‌گیری');
+            } catch (error) {
+                console.error(error);
+                addLog(error.message || 'ساخت پشتیبان ناموفق بود.', 'error');
+                setPct(0, 'عملیات با خطا متوقف شد.');
+                toast(error.message || 'ساخت پشتیبان ناموفق بود.', 'error', 'خطا');
+            } finally {
+                closeProgress();
+            }
+        }
+
+        // =========================================================
+        // RESTORE  (folder → DATA.xlsx + photos)
+        // Existing data is never cleared or overwritten; duplicates
+        // (same UsernameId or same 10-digit national code) are skipped.
+        // =========================================================
+        function readSheet(wb, name) {
+            var real = wb.SheetNames.filter(function (n) { return n.toLowerCase() === name.toLowerCase(); })[0];
+            return real ? XLSX.utils.sheet_to_json(wb.Sheets[real], { defval: '' }) : [];
+        }
+
+        async function runImport(fileList) {
+            if (busy) return;
+            var files = Array.prototype.slice.call(fileList || []);
+            if (!files.length) return;
+
+            var folderName = ((files[0].webkitRelativePath || '').split('/')[0]) || '';
+            openProgress('📦 بازیابی پشتیبان', folderName ? ('پوشه: ' + folderName) : '');
+
+            try {
+                requireXlsx();
+
+                // ---- locate workbook + photos ----
+                setPct(3, 'جست‌وجوی فایل اکسل...');
+                var xlsxFiles = files.filter(function (f) { return /\.xlsx$/i.test(f.name) && f.name.indexOf('~$') !== 0; });
+                var wbFile = xlsxFiles.filter(function (f) { return f.name.toLowerCase() === 'data.xlsx'; })[0] || xlsxFiles[0];
+                if (!wbFile) throw new Error('فایل DATA.xlsx در پوشه انتخاب‌شده پیدا نشد.');
+
+                var inPhotoDir = function (f) {
+                    return (f.webkitRelativePath || '').toLowerCase().split('/').slice(0, -1)
+                        .some(function (s) { return s === 'photo' || s === 'photos'; });
+                };
+                var pool = files.filter(inPhotoDir);
+                if (!pool.length) pool = files.filter(function (f) { return !/\.(xlsx|json)$/i.test(f.name); });
+                var photoMap = {};
+                pool.forEach(function (f) { var k = f.name.toLowerCase(); if (!photoMap[k]) photoMap[k] = f; });
+
+                var wb = XLSX.read(await wbFile.arrayBuffer(), { type: 'array' });
+                var idsRows = readSheet(wb, 'IDs');
+                if (!idsRows.length) throw new Error('شیت IDs در «' + wbFile.name + '» پیدا نشد یا خالی است.');
+
+                var topicsRows = readSheet(wb, 'Topics');
+                var tagsRows = readSheet(wb, 'Tags');
+                var photosRows = readSheet(wb, 'Photos');
+                var relationsRows = readSheet(wb, 'Relations');
+                var relTypeRows = readSheet(wb, 'RelationTypes');
+                var socialRows = readSheet(wb, 'SocialLinks');
+
+                addLog(idsRows.length.toLocaleString('fa-IR') + ' رکورد در ' + wbFile.name + ' پیدا شد.', 'info');
+                if (photosRows.length && !pool.length) addLog('پوشه عکس‌ها پیدا نشد؛ فقط اطلاعات متنی وارد می‌شود.', 'warning');
+
+                // ---- build candidates ----
+                setPct(8, 'آماده‌سازی رکوردها...');
+                var candidates = [];
+                idsRows.forEach(function (row) {
+                    var key = txt(row.id), social = txt(row.social_id);
+                    if (!key && !social) return;
+
+                    var recordId = normId(social || key);
+                    var first = txt(row.first_name), last = txt(row.last_name);
+                    if (!first && !last) {
+                        // "name" is only a fallback. Old workbooks sometimes put the ID in it – never use that as a name.
+                        var nm = txt(row.name);
+                        var nmKey = stripPrefix(nm).toLowerCase();
+                        var isIdLike = !nm || [key, social, recordId].some(function (k) {
+                            return k && (stripPrefix(k).toLowerCase() === nmKey || txt(k).toLowerCase() === nm.toLowerCase());
+                        });
+                        if (!isIdLike) { var sp = splitName(nm); first = sp.first; last = sp.last; }
+                    }
+
+                    var keys = {};
+                    [key, social, recordId].forEach(function (k) { if (k) keys[k] = 1; });
+
+                    var rowTags = txt(row.tags).split(/[،,]+/).map(txt).filter(Boolean);
+
+                    var links = socialRows.filter(function (s) {
+                        return keys[txt(s.id)] || keys[txt(s.social_id)];
+                    }).map(function (s) { return { platform: txt(s.platform), value: txt(s.value) }; })
+                      .filter(function (s) { return s.platform || s.value; });
+
+                    var photoFiles = [];
+                    photosRows.forEach(function (p) {
+                        if (!(keys[txt(p.id)] || keys[txt(p.social_id)])) return;
+                        var fname = txt(p.filename);
+                        if (!fname) return;
+                        var f = photoMap[fname.toLowerCase()];
+                        if (f) photoFiles.push(f); else addLog('فایل عکس «' + fname + '» پیدا نشد.', 'warning');
+                    });
+
+                    candidates.push({
+                        keys: Object.keys(keys),
+                        recordId: recordId,
+                        nationalKey: nationalKey(row.national_id),
+                        photoFiles: photoFiles,
+                        payload: {
+                            usernameId: recordId,
+                            pid: txt(row.pid),
+                            firstName: first,
+                            lastName: last,
+                            nationalCode: latinDigits(txt(row.national_id)),
+                            mobile: latinDigits(txt(row.mobile)),
+                            country: txt(row.country),
+                            topic: txt(row.topic_name),
+                            tags: rowTags,
+                            notes: row.notes === undefined || row.notes === null ? '' : String(row.notes),
+                            createdAt: txt(row.created_at),
+                            modifiedAt: txt(row.modified_at),
+                            createdBy: txt(row.created_by),
+                            modifiedBy: txt(row.modified_by),
+                            socialLinks: links
+                        }
+                    });
+                });
+                if (!candidates.length) throw new Error('هیچ رکورد معتبری در فایل پیدا نشد.');
+
+                // ---- 1) topics / tags / relation types ----
+                setPct(10, 'افزودن موضوعات، تگ‌ها و انواع رابطه...');
+                var uniq = function (arr) {
+                    var seen = {}, out = [];
+                    arr.forEach(function (v) { v = txt(v); if (v && !seen[v]) { seen[v] = 1; out.push(v); } });
+                    return out;
+                };
+                var meta = {
+                    topics: uniq(topicsRows.map(function (r) { return r.name; }).concat(candidates.map(function (c) { return c.payload.topic; }))),
+                    tags: uniq(tagsRows.map(function (r) { return r.name; }).concat([].concat.apply([], candidates.map(function (c) { return c.payload.tags; })))),
+                    relationTypes: uniq(relTypeRows.map(function (r) { return r.name || r.relation_type; })
+                        .concat(relationsRows.map(function (r) { return r.relation_type; })))
+                };
+                var metaRes = await postForm(CFG.metaUrl, { payload: JSON.stringify(meta) });
+                if (!metaRes.success) throw new Error(metaRes.message || 'افزودن موضوعات/تگ‌ها انجام نشد.');
+
+                // ---- 2) profiles (one request each: JSON + photos) ----
+                var idMap = {};                       // any key in the file → real UsernameId on the server
+                var seenIds = {}, seenNids = {};
+                var added = 0, failed = 0, photosSent = 0;
+                var duplicates = [];
+                var warned = {};
+
+                for (var i = 0; i < candidates.length; i++) {
+                    var c = candidates[i];
+                    var label = ((c.payload.firstName + ' ' + c.payload.lastName).trim() || c.recordId);
+                    setPct(12 + (i / candidates.length) * 73,
+                        'پردازش رکوردها (' + (i + 1).toLocaleString('fa-IR') + ' از ' + candidates.length.toLocaleString('fa-IR') + ')');
+
+                    var idKey = c.recordId.toLowerCase();
+                    var localDup = '';
+                    if (seenIds[idKey]) localDup = 'شناسه تکراری داخل فایل';
+                    else if (c.nationalKey && seenNids[c.nationalKey]) localDup = 'کد ملی تکراری داخل فایل';
+
+                    if (localDup) {
+                        duplicates.push({ id: c.recordId, name: label, reason: localDup });
+                        var firstId = seenIds[idKey] || seenNids[c.nationalKey];
+                        c.keys.forEach(function (k) { idMap[k] = firstId; });
+                        continue;
+                    }
+
+                    if (c.photoFiles.length > 1) addLog('«' + label + '»: فقط یک تصویر برای هر پروفایل پشتیبانی می‌شود؛ اولین تصویر وارد شد.', 'warning');
+
+                    try {
+                        var res = await postForm(CFG.profileUrl, { payload: JSON.stringify(c.payload) }, c.photoFiles.slice(0, 1));
+                        if (!res.success) {
+                            failed++;
+                            addLog('«' + label + '» ثبت نشد: ' + (res.message || 'خطای نامشخص'), 'error');
+                            continue;
+                        }
+                        if (res.warning && !warned[res.warning]) { warned[res.warning] = 1; addLog(res.warning, 'warning'); }
+                        var realId = txt(res.usernameId) || c.recordId;
+                        seenIds[idKey] = realId;
+                        if (c.nationalKey) seenNids[c.nationalKey] = realId;
+                        c.keys.forEach(function (k) { idMap[k] = realId; });
+
+                        if (res.status === 'duplicate') {
+                            duplicates.push({ id: c.recordId, name: label, reason: txt(res.reason) || 'شناسه یا کد ملی تکراری' });
+                        } else {
+                            added++;
+                            photosSent += Number(res.photos || 0);
+                        }
+                    } catch (e) {
+                        failed++;
+                        addLog('«' + label + '» ثبت نشد: ' + (e.message || 'خطا در ارتباط با سرور'), 'error');
+                    }
+                }
+
+                duplicates.forEach(function (d) {
+                    addLog('تکراری (رد شد): ' + d.id + ' — ' + d.name + ' — ' + d.reason, 'warning');
+                });
+
+                // ---- 3) relations ----
+                setPct(88, 'افزودن روابط...');
+                var relItems = [], relSkipped = 0;
+                relationsRows.forEach(function (r) {
+                    var from = idMap[txt(r.from_id)] || idMap[txt(r.from_social_id)] || idMap[normId(r.from_social_id)];
+                    var to = idMap[txt(r.to_id)] || idMap[txt(r.to_social_id)] || idMap[normId(r.to_social_id)];
+                    var type = txt(r.relation_type);
+                    if (!from || !to || !type || from === to) { relSkipped++; return; }
+                    relItems.push({ fromId: from, toId: to, type: type });
+                });
+
+                var relAdded = 0;
+                if (relItems.length) {
+                    var relRes = await postForm(CFG.relationsUrl, { payload: JSON.stringify({ items: relItems }) });
+                    if (!relRes.success) {
+                        addLog('افزودن روابط انجام نشد: ' + (relRes.message || 'خطای نامشخص'), 'error');
+                    } else {
+                        relAdded = Number(relRes.added || 0);
+                        relSkipped += Number(relRes.skipped || 0);
+                    }
+                }
+
+                // ---- done ----
+                setPct(100, 'عملیات تکمیل شد');
+                var summary = [
+                    'رکورد افزوده‌شده: ' + added.toLocaleString('fa-IR'),
+                    'رکورد تکراری (رد شد): ' + duplicates.length.toLocaleString('fa-IR'),
+                    'رابطه افزوده‌شده: ' + relAdded.toLocaleString('fa-IR') + (relSkipped ? ' (ردشده/تکراری: ' + relSkipped.toLocaleString('fa-IR') + ')' : ''),
+                    'پیوست منتقل‌شده: ' + photosSent.toLocaleString('fa-IR')
+                ];
+                if (failed) summary.push('ناموفق: ' + failed.toLocaleString('fa-IR'));
+                showResult(summary);
+                $('bkReloadBtn').hidden = false;
+
+                toast(summary.slice(0, 3).join('\n'), failed ? 'warning' : 'success', 'بازیابی انجام شد');
+
+                if (typeof window.notifyMetadataChanged === 'function') {
+                    window.notifyMetadataChanged('topic');
+                    window.notifyMetadataChanged('tag');
+                    window.notifyMetadataChanged('relation');
+                }
+                document.dispatchEvent(new CustomEvent('backup:imported', { detail: { added: added } }));
+            } catch (error) {
+                console.error(error);
+                addLog(error.message || 'عملیات ناموفق بود.', 'error');
+                setPct(0, 'عملیات با خطا متوقف شد.');
+                toast(error.message || 'عملیات ناموفق بود.', 'error', 'خطا');
+            } finally {
+                closeProgress();
+            }
+        }
+
+        // =========================================================
+        // DELETE ALL DATA
+        // =========================================================
+        async function runDeleteAll() {
+            if (busy) return;
+            try {
+                openProgress('🗑️ حذف همه داده‌ها', 'پروفایل‌ها، روابط، شبکه‌های اجتماعی، تصاویر و موضوعات');
+                setPct(20, 'در حال حذف اطلاعات از پایگاه داده...');
+
+                var res = await postForm(CFG.deleteAllUrl, {});
+                if (!res.success) throw new Error(res.message || 'حذف اطلاعات انجام نشد.');
+
+                setPct(100, 'حذف انجام شد');
+                showResult([
+                    'پروفایل حذف‌شده: ' + Number(res.profiles || 0).toLocaleString('fa-IR'),
+                    'رابطه حذف‌شده: ' + Number(res.relations || 0).toLocaleString('fa-IR'),
+                    'شبکه اجتماعی حذف‌شده: ' + Number(res.socialLinks || 0).toLocaleString('fa-IR'),
+                    'موضوع حذف‌شده: ' + Number(res.topics || 0).toLocaleString('fa-IR'),
+                    'تصویر حذف‌شده: ' + Number(res.images || 0).toLocaleString('fa-IR')
+                ]);
+                $('bkReloadBtn').hidden = false;
+                toast('همه داده‌ها حذف شدند.', 'success', 'حذف انجام شد');
+
+                if (typeof window.notifyMetadataChanged === 'function') {
+                    window.notifyMetadataChanged('topic');
+                }
+            } catch (error) {
+                console.error(error);
+                addLog(error.message || 'حذف اطلاعات ناموفق بود.', 'error');
+                setPct(0, 'عملیات با خطا متوقف شد.');
+                toast(error.message || 'حذف اطلاعات ناموفق بود.', 'error', 'خطا');
+            } finally {
+                closeProgress();
+            }
+        }
+
+        // ---------------------------------------------------------
+        // Wiring
+        // ---------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', function () {
+            var input = $('bkFolderInput');
+            var modal = $('bkProgressModal');
+
+            $('bkBackupBtn')?.addEventListener('click', runBackup);
+
+            $('bkRestoreBtn')?.addEventListener('click', function () {
+                if (busy || !input) return;
+                input.value = '';
+                input.click();
+            });
+
+            input?.addEventListener('change', function () {
+                var list = input.files;
+                if (list && list.length) runImport(list);
+            });
+
+            // ---- delete ALL data (typed confirmation) ----
+            var delModal = $('bkDeleteModal');
+            var delInput = $('bkDeleteInput');
+            var delConfirm = $('bkDeleteConfirmBtn');
+
+            function closeDelete() { delModal.classList.remove('show'); }
+
+            $('bkDeleteAllBtn')?.addEventListener('click', function () {
+                if (busy) return;
+                var st = $('settingsModal');
+                if (st) st.classList.remove('show');
+                delInput.value = '';
+                delConfirm.disabled = true;
+                delModal.classList.add('show');
+                setTimeout(function () { delInput.focus(); }, 50);
+            });
+
+            delInput?.addEventListener('input', function () {
+                delConfirm.disabled = delInput.value.trim() !== 'حذف';
+            });
+            delInput?.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); if (!delConfirm.disabled) delConfirm.click(); }
+            });
+            $('bkDeleteCancelBtn')?.addEventListener('click', closeDelete);
+            $('bkDeleteCloseX')?.addEventListener('click', closeDelete);
+            delConfirm?.addEventListener('click', function () {
+                if (delInput.value.trim() !== 'حذف') return;
+                closeDelete();
+                runDeleteAll();
+            });
+
+            function closeIfIdle() { if (!busy) modal.classList.remove('show'); }
+            $('bkCloseBtn')?.addEventListener('click', closeIfIdle);
+            $('bkCloseX')?.addEventListener('click', closeIfIdle);
+            $('bkReloadBtn')?.addEventListener('click', function () { window.location.reload(); });
+
+            // while an operation runs: ignore backdrop click and Esc (the page-level handlers would hide the modal)
+            modal?.addEventListener('click', function (e) { if (busy && e.target === modal) e.stopPropagation(); });
+            window.addEventListener('keydown', function (e) {
+                if (busy && e.key === 'Escape') e.stopPropagation();
+            }, true);
+        });
+    })();
+    </script>
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>
