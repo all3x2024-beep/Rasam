@@ -153,6 +153,29 @@ namespace Rasam.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "a1000000-0000-0000-0000-000000000001",
+                            ConcurrencyStamp = "role-admin-1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "a1000000-0000-0000-0000-000000000002",
+                            ConcurrencyStamp = "role-operator-1",
+                            Name = "Operator",
+                            NormalizedName = "OPERATOR"
+                        },
+                        new
+                        {
+                            Id = "a1000000-0000-0000-0000-000000000003",
+                            ConcurrencyStamp = "role-viewer-1",
+                            Name = "Viewer",
+                            NormalizedName = "VIEWER"
+                        });
                 });
 
             modelBuilder.Entity("Rasam.Models.Accounting.User", b =>

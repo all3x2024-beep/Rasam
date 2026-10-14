@@ -95,6 +95,17 @@ builder.Services.Configure<IISServerOptions>(options =>
 // ========================================
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var adminName = builder.Configuration["AdminUserName"];
+
+    var admin = string.IsNullOrWhiteSpace(adminName) ? null : await users.FindByNameAsync(adminName);
+
+    if (admin != null && !await users.IsInRoleAsync(admin, AppRoles.Admin))
+        await users.AddToRoleAsync(admin, AppRoles.Admin);
+}
+
 // ========================================
 // Pipeline
 // ========================================
@@ -107,6 +118,9 @@ else
 {
     app.UseMigrationsEndPoint();
 }
+
+
+
 
 app.UseHttpsRedirection();
 

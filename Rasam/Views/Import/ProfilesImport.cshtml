@@ -5,199 +5,254 @@
 <section class="card" dir="rtl">
 
     <div class="toolbar">
-
-        <button class="btn btn-primary">
-              
-            📊 ورود اطلاعات پروفایل از اکسل
-        </button>
-
+        <strong>📊 ورود اطلاعات پروفایل از اکسل</strong>
     </div>
 
     <div class="table-wrap">
 
         @if (TempData["ImportError"] is string report)
         {
-            <div class="p-3" dir="rtl">
-                <h5>⚠️ گزارش نهایی Import</h5>
+            <div class="bk-result" role="alert">
+                <div class="bk-log">
+                    <div class="error">
+                        <strong>⚠️ گزارش نهایی Import</strong>
+                    </div>
 
-                <pre class="text-wrap mb-0"
-                     style="white-space: pre-wrap; overflow-wrap: anywhere;">@report</pre>
+                    @foreach (var line in report.Split(
+                                    '\n', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        <div class="error">@line.TrimEnd('\r')</div>
+                    }
+                </div>
             </div>
         }
 
         @if (TempData["ImportSuccess"] is string success)
         {
-            <div class="p-3" role="status">
-                <strong>✅ عملیات موفق</strong>
-                <p class="mb-0 mt-2">@success</p>
+            <div class="bk-result" role="status">
+                <div class="bk-log">
+                    <div class="success">
+                        <strong>✅ عملیات موفق</strong>
+                    </div>
+                    <div class="success">@success</div>
+                </div>
             </div>
         }
 
-        <div class="p-3">
+        <p class="bk-note">
+            <strong>راهنما:</strong>
+            فایل اکسل و پوشه تصاویر را انتخاب کنید.
+            نام فایل تصاویر باید با ستون Image در اکسل مطابقت داشته باشد.
+        </p>
 
-            <div class="mb-4">
-                <strong>راهنما</strong>
+        <form asp-controller="Import"
+              asp-action="ProfilesImport"
+              method="post"
+              enctype="multipart/form-data"
+              id="profileImportForm">
 
-                <p class="mt-2 mb-0">
-                    فایل اکسل باید شامل ستون‌های موردنیاز جدول Profile باشد.
-                    فقط فایل با فرمت XLSX انتخاب کنید.
-                </p>
-            </div>
+            @Html.AntiForgeryToken()
 
-            <form asp-controller="Import"
-                  asp-action="ProfilesImport"
-                  method="post"
-                  enctype="multipart/form-data"
-                  id="profileImportForm">
+            <div class="form-group mb-3">
+                <label for="file" class="form-label">
+                    فایل اکسل (XLSX)
+                </label>
 
-                @Html.AntiForgeryToken()
-
-                <div class="mb-3">
-
-                    <label for="file" class="form-label">
-                        انتخاب فایل اکسل
-                    </label>
-
+                <div class="attach-controls">
                     <input type="file"
                            id="file"
                            name="file"
-                           class="form-control"
+                           class="attach-file-input"
                            accept=".xlsx"
                            required />
 
-                    <p id="fileInfo" class="mt-2 mb-0"></p>
+                    <label for="file" class="attach-pick-btn">
+                        📁 انتخاب فایل اکسل
+                    </label>
 
-                    <p id="fileError"
-                       class="mt-2 mb-0"
-                       hidden
-                       role="alert"></p>
-
+                    <span id="fileInfo" class="attach-status">
+                        فایلی انتخاب نشده است.
+                    </span>
                 </div>
 
-                <div class="toolbar">
+                <p id="fileError"
+                   class="field-hint"
+                   hidden
+                   role="alert"></p>
+            </div>
 
-                    <button type="submit"
-                            id="submitButton"
-                            class="btn btn-primary">
-                        📤 شروع Import
-                    </button>
+            <div class="form-group mb-3">
+                <label for="images" class="form-label">
+                    پوشه تصاویر (media)
+                </label>
 
-                    <button type="button"
-                            id="removeFileBtn"
-                            class="btn btn-info">
-                        🗑️ حذف فایل انتخاب‌شده
-                    </button>
+                <div class="attach-controls">
+                    <input type="file"
+                           id="images"
+                           name="images"
+                           class="attach-file-input"
+                           webkitdirectory
+                           directory
+                           multiple
+                           required />
 
+                    <label for="images" class="attach-pick-btn">
+                        🖼️ انتخاب پوشه تصاویر
+                    </label>
+
+                    <span id="imagesInfo" class="attach-status">
+                        پوشه‌ای انتخاب نشده است.
+                    </span>
                 </div>
 
-            </form>
+                <p id="imagesError"
+                   class="field-hint"
+                   hidden
+                   role="alert"></p>
+            </div>
 
-        </div>
+            <div class="toolbar">
+                <button type="submit"
+                        id="submitButton"
+                        class="btn btn-primary">
+                    📤 شروع Import
+                </button>
 
+                <button type="button"
+                        id="removeFilesBtn"
+                        class="btn btn-info">
+                    🗑️ حذف فایل‌های انتخاب‌شده
+                </button>
+            </div>
+
+        </form>
     </div>
-
 </section>
 
 @section Scripts {
     <script>
         (() => {
             const fileInput = document.getElementById('file');
+            const imagesInput = document.getElementById('images');
+
             const fileInfo = document.getElementById('fileInfo');
+            const imagesInfo = document.getElementById('imagesInfo');
+
             const fileError = document.getElementById('fileError');
+            const imagesError = document.getElementById('imagesError');
+
             const form = document.getElementById('profileImportForm');
             const submitButton = document.getElementById('submitButton');
-            const removeFileBtn = document.getElementById('removeFileBtn');
+            const removeFilesBtn = document.getElementById('removeFilesBtn');
 
             let isSubmitting = false;
 
-            function clearError() {
-                fileError.textContent = '';
-                fileError.hidden = true;
+            function showError(element, message) {
+                element.textContent = message;
+                element.hidden = false;
+            }
+
+            function clearError(element) {
+                element.textContent = '';
+                element.hidden = true;
+            }
+
+            function validateExcel() {
+                clearError(fileError);
                 fileInput.setCustomValidity('');
-            }
 
-            function showError(message) {
-                fileError.textContent = message;
-                fileError.hidden = false;
-                fileInput.setCustomValidity(message);
-            }
-
-            function resetFile() {
-                fileInput.value = '';
-                fileInfo.textContent = '';
-                clearError();
-            }
-
-            function validateFile(file) {
-                clearError();
+                const file = fileInput.files?.[0];
 
                 if (!file) {
-                    fileInfo.textContent = '';
+                    showError(fileError, 'فایل اکسل را انتخاب کنید.');
+                    fileInput.setCustomValidity('فایل اکسل الزامی است.');
                     return false;
                 }
 
                 if (!file.name.toLowerCase().endsWith('.xlsx')) {
-                    resetFile();
-                    showError('لطفاً یک فایل با فرمت XLSX انتخاب کنید.');
+                    showError(fileError, 'فرمت فایل باید XLSX باشد.');
+                    fileInput.setCustomValidity('فرمت فایل باید XLSX باشد.');
                     return false;
                 }
 
                 if (file.size === 0) {
-                    resetFile();
-                    showError('فایل انتخاب‌شده خالی است.');
+                    showError(fileError, 'فایل اکسل خالی است.');
+                    fileInput.setCustomValidity('فایل اکسل خالی است.');
                     return false;
                 }
 
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-
                 fileInfo.textContent =
-                    `نام فایل: ${file.name} | حجم: ${sizeMB} MB`;
+                    `فایل: ${file.name} | حجم: ${(file.size / 1048576).toFixed(2)} MB`;
 
                 return true;
             }
 
-            fileInput.addEventListener('change', function () {
-                const file = this.files && this.files[0];
+            function validateImages() {
+                clearError(imagesError);
+                imagesInput.setCustomValidity('');
 
-                if (!file) {
-                    fileInfo.textContent = '';
-                    clearError();
-                    return;
+                const files = Array.from(imagesInput.files || []);
+
+                if (files.length === 0) {
+                    showError(imagesError, 'پوشه تصاویر را انتخاب کنید.');
+                    imagesInput.setCustomValidity('انتخاب تصاویر الزامی است.');
+                    return false;
                 }
 
-                validateFile(file);
+                const allowed = /\.(jpg|jpeg|png|webp|jfif)$/i;
+
+                const validImages = files.filter(
+                    f => allowed.test(f.name)
+                );
+
+                if (validImages.length === 0) {
+                    showError(
+                        imagesError,
+                        'پوشه انتخاب‌شده تصویر معتبر ندارد.'
+                    );
+
+                    imagesInput.setCustomValidity(
+                        'هیچ تصویر معتبری انتخاب نشده است.'
+                    );
+
+                    return false;
+                }
+
+                imagesInfo.textContent =
+                    `${validImages.length} تصویر معتبر از ${files.length} فایل انتخاب شد.`;
+
+                return true;
+            }
+
+            fileInput.addEventListener('change', validateExcel);
+            imagesInput.addEventListener('change', validateImages);
+
+            removeFilesBtn.addEventListener('click', () => {
+                if (isSubmitting) return;
+
+                fileInput.value = '';
+                imagesInput.value = '';
+
+                fileInfo.textContent = 'فایلی انتخاب نشده است.';
+                imagesInfo.textContent = 'پوشه‌ای انتخاب نشده است.';
+
+                clearError(fileError);
+                clearError(imagesError);
+
+                fileInput.setCustomValidity('');
+                imagesInput.setCustomValidity('');
             });
 
-            removeFileBtn.addEventListener('click', function () {
-                if (isSubmitting) {
-                    return;
-                }
-
-                resetFile();
-            });
-
-            form.addEventListener('submit', function (event) {
+            form.addEventListener('submit', event => {
                 if (isSubmitting) {
                     event.preventDefault();
                     return;
                 }
 
-                const file = fileInput.files && fileInput.files[0];
+                const excelValid = validateExcel();
+                const imagesValid = validateImages();
 
-                if (!file) {
-                    event.preventDefault();
-                    showError('ابتدا یک فایل اکسل انتخاب کنید.');
-                    fileInput.reportValidity();
-                    return;
-                }
-
-                if (!validateFile(file)) {
-                    event.preventDefault();
-                    fileInput.reportValidity();
-                    return;
-                }
-
-                if (!form.checkValidity()) {
+                if (!excelValid || !imagesValid) {
                     event.preventDefault();
                     form.reportValidity();
                     return;
@@ -206,10 +261,9 @@
                 isSubmitting = true;
 
                 submitButton.disabled = true;
-                removeFileBtn.disabled = true;
+                removeFilesBtn.disabled = true;
 
-                submitButton.textContent =
-                    '⏳ در حال پردازش فایل...';
+                submitButton.textContent = '⏳ در حال پردازش...';
             });
         })();
     </script>

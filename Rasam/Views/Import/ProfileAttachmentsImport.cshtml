@@ -1,0 +1,286 @@
+﻿@{
+    ViewData["Title"] = "ورود پیوست‌های پروفایل از اکسل";
+}
+
+<section class="card" dir="rtl">
+
+    <div class="toolbar">
+        <strong>📊 ورود پیوست‌های پروفایل از اکسل</strong>
+    </div>
+
+    <div class="table-wrap">
+
+        @if (TempData["ImportError"] is string report)
+        {
+            <div class="bk-result" role="alert">
+                <div class="bk-log">
+                    <div class="error">
+                        <strong>⚠️ گزارش نهایی Import</strong>
+                    </div>
+
+                    @foreach (var line in report.Split(
+                                    '\n',
+                                    StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        <div class="error">@line.TrimEnd('\r')</div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (TempData["ImportSuccess"] is string success)
+        {
+            <div class="bk-result" role="status">
+                <div class="bk-log">
+                    <div class="success">
+                        <strong>✅ عملیات موفق</strong>
+                    </div>
+
+                    <div class="success">@success</div>
+                </div>
+            </div>
+        }
+
+        <p class="bk-note">
+            <strong>راهنما:</strong>
+            فایل اکسل و پوشه تصاویر را انتخاب کنید.
+            مقدار ستون ProfileId باید برابر با Id پروفایل
+            در دیتابیس باشد.
+            نام ستون FileName نیز باید با نام تصویر مطابقت داشته باشد.
+        </p>
+
+        <form asp-controller="Import"
+              asp-action="ProfileAttachmentsImport"
+              method="post"
+              enctype="multipart/form-data"
+              id="profileAttachmentImportForm">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group mb-3">
+                <label for="file" class="form-label">
+                    فایل اکسل (XLSX)
+                </label>
+
+                <div class="attach-controls">
+                    <input type="file"
+                           id="file"
+                           name="file"
+                           class="attach-file-input"
+                           accept=".xlsx"
+                           required />
+
+                    <label for="file" class="attach-pick-btn">
+                        📁 انتخاب فایل اکسل
+                    </label>
+
+                    <span id="fileInfo" class="attach-status">
+                        فایلی انتخاب نشده است.
+                    </span>
+                </div>
+
+                <p id="fileError"
+                   class="field-hint"
+                   hidden
+                   role="alert"></p>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="images" class="form-label">
+                    پوشه تصاویر
+                </label>
+
+                <div class="attach-controls">
+                    <input type="file"
+                           id="images"
+                           name="images"
+                           class="attach-file-input"
+                           webkitdirectory
+                           directory
+                           multiple
+                           required />
+
+                    <label for="images" class="attach-pick-btn">
+                        🖼️ انتخاب پوشه تصاویر
+                    </label>
+
+                    <span id="imagesInfo" class="attach-status">
+                        پوشه‌ای انتخاب نشده است.
+                    </span>
+                </div>
+
+                <p id="imagesError"
+                   class="field-hint"
+                   hidden
+                   role="alert"></p>
+            </div>
+
+            <div class="toolbar">
+                <button type="submit"
+                        id="submitButton"
+                        class="btn btn-primary">
+                    📤 شروع Import
+                </button>
+
+                <button type="button"
+                        id="removeFilesBtn"
+                        class="btn btn-info">
+                    🗑️ حذف فایل‌های انتخاب‌شده
+                </button>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const fileInput = document.getElementById('file');
+            const imagesInput = document.getElementById('images');
+
+            const fileInfo = document.getElementById('fileInfo');
+            const imagesInfo = document.getElementById('imagesInfo');
+
+            const fileError = document.getElementById('fileError');
+            const imagesError = document.getElementById('imagesError');
+
+            const form = document.getElementById(
+                'profileAttachmentImportForm');
+
+            const submitButton = document.getElementById('submitButton');
+            const removeFilesBtn = document.getElementById('removeFilesBtn');
+
+            let isSubmitting = false;
+
+            function showError(element, message) {
+                element.textContent = message;
+                element.hidden = false;
+            }
+
+            function clearError(element) {
+                element.textContent = '';
+                element.hidden = true;
+            }
+
+            function validateExcel() {
+                clearError(fileError);
+                fileInput.setCustomValidity('');
+
+                const file = fileInput.files?.[0];
+
+                if (!file) {
+                    showError(fileError, 'فایل اکسل را انتخاب کنید.');
+                    fileInput.setCustomValidity(
+                        'فایل اکسل الزامی است.');
+                    return false;
+                }
+
+                if (!file.name.toLowerCase().endsWith('.xlsx')) {
+                    showError(fileError, 'فرمت فایل باید XLSX باشد.');
+                    fileInput.setCustomValidity(
+                        'فرمت فایل باید XLSX باشد.');
+                    return false;
+                }
+
+                if (file.size === 0) {
+                    showError(fileError, 'فایل اکسل خالی است.');
+                    fileInput.setCustomValidity(
+                        'فایل اکسل خالی است.');
+                    return false;
+                }
+
+                fileInfo.textContent =
+                    `فایل: ${file.name} | حجم: ${
+                        (file.size / 1048576).toFixed(2)
+                    } MB`;
+
+                return true;
+            }
+
+            function validateImages() {
+                clearError(imagesError);
+                imagesInput.setCustomValidity('');
+
+                const files = Array.from(imagesInput.files || []);
+
+                if (files.length === 0) {
+                    showError(
+                        imagesError,
+                        'پوشه تصاویر را انتخاب کنید.');
+
+                    imagesInput.setCustomValidity(
+                        'انتخاب تصاویر الزامی است.');
+
+                    return false;
+                }
+
+                const allowed = /\.(jpg|jpeg|png|webp|jfif)$/i;
+
+                const validImages = files.filter(
+                    f => allowed.test(f.name)
+                );
+
+                if (validImages.length === 0) {
+                    showError(
+                        imagesError,
+                        'پوشه انتخاب‌شده تصویر معتبر ندارد.');
+
+                    imagesInput.setCustomValidity(
+                        'هیچ تصویر معتبری انتخاب نشده است.');
+
+                    return false;
+                }
+
+                imagesInfo.textContent =
+                    `${validImages.length} تصویر معتبر از ${
+                        files.length
+                    } فایل انتخاب شد.`;
+
+                return true;
+            }
+
+            fileInput.addEventListener('change', validateExcel);
+            imagesInput.addEventListener('change', validateImages);
+
+            removeFilesBtn.addEventListener('click', () => {
+                if (isSubmitting) return;
+
+                fileInput.value = '';
+                imagesInput.value = '';
+
+                fileInfo.textContent = 'فایلی انتخاب نشده است.';
+                imagesInfo.textContent = 'پوشه‌ای انتخاب نشده است.';
+
+                clearError(fileError);
+                clearError(imagesError);
+
+                fileInput.setCustomValidity('');
+                imagesInput.setCustomValidity('');
+            });
+
+            form.addEventListener('submit', event => {
+                if (isSubmitting) {
+                    event.preventDefault();
+                    return;
+                }
+
+                const excelValid = validateExcel();
+                const imagesValid = validateImages();
+
+                if (!excelValid || !imagesValid) {
+                    event.preventDefault();
+                    form.reportValidity();
+                    return;
+                }
+
+                isSubmitting = true;
+
+                submitButton.disabled = true;
+                removeFilesBtn.disabled = true;
+
+                submitButton.textContent = '⏳ در حال پردازش...';
+            });
+        })();
+    </script>
+}

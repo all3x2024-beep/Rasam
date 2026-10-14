@@ -62,6 +62,12 @@ namespace Rasam.Data
                 .WithMany(x => x.Attachments)
                 .HasForeignKey(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Role>().HasData(
+    new Role { Id = "a1000000-0000-0000-0000-000000000001", Name = AppRoles.Admin, NormalizedName = "ADMIN", ConcurrencyStamp = "role-admin-1" },
+    new Role { Id = "a1000000-0000-0000-0000-000000000002", Name = AppRoles.Operator, NormalizedName = "OPERATOR", ConcurrencyStamp = "role-operator-1" },
+    new Role { Id = "a1000000-0000-0000-0000-000000000003", Name = AppRoles.Viewer, NormalizedName = "VIEWER", ConcurrencyStamp = "role-viewer-1" }
+);
         }
     }
 

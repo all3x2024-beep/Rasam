@@ -9,5 +9,12 @@ namespace Rasam.Models.Accounting
         [NotMapped]
         public string? TempUserId { get; set; }
 
+
+    }
+    public static class AppRoles
+    {
+        public const string Admin = "Admin";     // همه کارها
+        public const string Operator = "Operator";  // ثبت/ویرایش رکورد
+        public const string Viewer = "Viewer";    // فقط مشاهده
     }
 }

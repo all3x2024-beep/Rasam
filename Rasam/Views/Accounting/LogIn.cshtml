@@ -9,16 +9,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - سامانه بانک اطلاعات تصویری رصام</title>
-
+    <link href="~/css/core/login.css" rel="stylesheet" />
+    <link href="~/css/core/base.css" rel="stylesheet" />
     <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
-	<link href="~/css/toast.css" rel="stylesheet" />
-
+    <link href="~/css/components/toast.css" rel="stylesheet" />
+    <link href="~/css/core/layout.css" rel="stylesheet" />
+    <link href="~/css/core/footer.css" rel="stylesheet" />
 </head>
+
 <!-- Toast Container -->
 <div class="app-toast-container-top">
-
     @if (TempData["msg"] != null)
     {
         <div class="app-toast" id="systemToast">
@@ -27,10 +27,12 @@
                 <strong class="app-toast-title">اعلان سیستم</strong>
                 <button type="button" class="btn-close-custom" onclick="closeToast()">×</button>
             </div>
+
             <!-- نوار پیشرفت زمان -->
             <div class="app-toast-progress-container">
                 <div class="app-toast-progress-bar" id="toastProgress"></div>
             </div>
+
             <div class="app-toast-body">
                 @TempData["msg"]
             </div>
@@ -89,8 +91,10 @@
                         <label for="PassWordTemp">رمز عبور</label>
                         <a href="@Url.Action("ForgotPassWordTemp", "Accounting")" class="login-link">فراموشی رمز عبور</a>
                     </div>
+
                     <div class="login-input-wrap">
                         <span class="login-input-icon" aria-hidden="true">🔒</span>
+
                         <input id="PassWordTemp"
                                name="PassWordTemp"
                                type="password"
@@ -98,13 +102,28 @@
                                placeholder="رمز عبور خود را وارد کنید"
                                autocomplete="current-password"
                                required />
-                        <button type="button"
-                                class="login-PassWordTemp-toggle"
+
+                        <span type="button"
+                                class"btn"
                                 id="PassWordTempToggle"
                                 aria-label="نمایش رمز عبور"
                                 title="نمایش رمز عبور">
-                            👁️
-                        </button>
+
+                            <svg id="PassWordTempEyeIcon"
+                                 width="20"
+                                 height="20"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+
+                        </span>
                     </div>
                 </div>
 
@@ -124,26 +143,38 @@
                 سامانه آماده به کار است
             </div>
         </section>
-
-        <p class="login-credit">توسعه یافته توسط سرباز گمنام</p>
     </main>
 
     <script>
         (() => {
             const toggle = document.getElementById('PassWordTempToggle');
             const input = document.getElementById('PassWordTemp');
+            const eyeIcon = document.getElementById('PassWordTempEyeIcon');
 
-            if (toggle && input) {
+            if (toggle && input && eyeIcon) {
                 toggle.addEventListener('click', () => {
                     const visible = input.type === 'text';
+
                     input.type = visible ? 'password' : 'text';
-                    toggle.textContent = visible ? '👁️' : '🙈';
-                    toggle.setAttribute('aria-label', visible ? 'نمایش رمز عبور' : 'پنهان کردن رمز عبور');
+
+                    eyeIcon.innerHTML = visible
+                        ? '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'
+                        : '<path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A11.5 11.5 0 0 1 12 5c6.4 0 10 7 10 7a15.8 15.8 0 0 1-4 4.7"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1.1 0 2.2-.2 3.2-.6"/>';
+
+                    toggle.setAttribute(
+                        'aria-label',
+                        visible ? 'نمایش رمز عبور' : 'پنهان کردن رمز عبور'
+                    );
+
+                    toggle.setAttribute(
+                        'title',
+                        visible ? 'نمایش رمز عبور' : 'پنهان کردن رمز عبور'
+                    );
                 });
             }
         })();
     </script>
 
-	<script src="~/js/toast.js"></script>
+    <script src="~/js/toast.js"></script>
 </body>
 </html>

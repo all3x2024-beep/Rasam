@@ -1,0 +1,54 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "ورود به سامانه";
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - سامانه بانک اطلاعات تصویری رصام</title>
+    <link href="~/css/core/login.css" rel="stylesheet" />
+    <link href="~/css/core/base.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
+    <link href="~/css/components/toast.css" rel="stylesheet" />
+    <link href="~/css/core/layout.css" rel="stylesheet" />
+    <link href="~/css/core/footer.css" rel="stylesheet" />
+</head>
+
+<!-- Toast Container -->
+<div class="app-toast-container-top">
+    @if (TempData["msg"] != null)
+    {
+        <div class="app-toast" id="systemToast">
+            <div class="app-toast-header">
+                <span class="app-toast-icon">ℹ️</span>
+                <strong class="app-toast-title">اعلان سیستم</strong>
+                <button type="button" class="btn-close-custom" onclick="closeToast()">×</button>
+            </div>
+
+            <!-- نوار پیشرفت زمان -->
+            <div class="app-toast-progress-container">
+                <div class="app-toast-progress-bar" id="toastProgress"></div>
+            </div>
+
+            <div class="app-toast-body">
+                @TempData["msg"]
+            </div>
+        </div>
+    }
+</div>
+
+<body class="login-page">
+    <canvas class="app-bg-canvas" id="appBackgroundCanvas" aria-hidden="true"></canvas>
+
+    <section class="card" dir="rtl">
+        <div class="empty-state">
+            <div class="empty-icon">🔒</div>
+            <h3>شما به این بخش دسترسی ندارید</h3>
+            <p>برای دریافت دسترسی با مدیر سیستم تماس بگیرید.</p>
+        </div>
+    </section>
+</body>
+</html>

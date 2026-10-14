@@ -123,6 +123,35 @@ namespace Rasam.Controllers
             return RedirectToAction("UserIndex", "Accounting");
         }
 
+
+        [Authorize(Roles = AppRoles.Admin)]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetRole(string userId, string role)
+        {
+            if (role != AppRoles.Admin && role != AppRoles.Operator && role != AppRoles.Viewer)
+                return BadRequest(new { success = false, message = "نقش نامعتبر است." });
+
+            var user = await _UserManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound(new { success = false, message = "کاربر پیدا نشد." });
+
+            var current = await _UserManager.GetRolesAsync(user);
+
+            // ادمین آخر نباید نقشش را از دست بدهد
+            if (current.Contains(AppRoles.Admin) && role != AppRoles.Admin &&
+                (await _UserManager.GetUsersInRoleAsync(AppRoles.Admin)).Count <= 1)
+                return BadRequest(new { success = false, message = "حداقل یک ادمین باید باقی بماند." });
+
+            await _UserManager.RemoveFromRolesAsync(user, current);
+            await _UserManager.AddToRoleAsync(user, role);
+            await _UserManager.UpdateSecurityStampAsync(user);
+
+            return Json(new { success = true });
+        }
+
+        [Authorize]
+        public IActionResult AccessDenied() => View();
+
         [HttpGet]
         [Authorize]
         public IActionResult ChangeUser()
@@ -246,80 +275,6 @@ namespace Rasam.Controllers
             return RedirectToAction("UserIndex", "Accounting");
         }
 
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([FromForm] User item)
-        {
-            PersianCalendar p = new PersianCalendar();
-            DateTime now = DateTime.Now;
-            string date = $"{p.GetYear(now):0000}/{p.GetMonth(now):00}/{p.GetDayOfMonth(now):00}";
-            string clock = $"{p.GetHour(now):00}:{p.GetMinute(now):00}";
-
-            string s = "";
-            try
-            {
-                item.UserName = item.UsernameTemp;
-                item.DateRegister = date + " - " + clock;
-                item.CreateBY = @User.Identity?.Name;
-
-                var findUser = await _UserManager.FindByNameAsync(item.UsernameTemp);
-                if (findUser is not null)
-                {
-                    TempData["msg"] = " قبلا ثبت نام شده است";
-                }
-                IdentityResult identityResult = await _UserManager.CreateAsync(item, item.PassWordTemp);
-
-                if (identityResult.Succeeded)
-                {
-
-
-                    await _UserManager.UpdateAsync(item);
-                }
-
-
-                foreach (var e in identityResult.Errors.ToList())
-                {
-                    s = s + e.Description;
-                }
-                if (s.Contains("uppercase") || s.Contains("digit") || s.Contains("alphanumeric"))
-                {
-                    TempData["msg"] = "رمز عبور باید شامل حروف کوچک، بزرگ، علائم و اعداد باشد" + s;
-                }
-
-                item.RoleTemp = "Hefazat";
-
-                var roleExist = await _roleManager.RoleExistsAsync(item.RoleTemp);
-                if (!roleExist)
-                {
-                    var roleResult = await _roleManager.CreateAsync(new Role { Name = item.RoleTemp });
-                }
-                var result = await _UserManager.AddToRoleAsync(item, item.RoleTemp);
-
-                if (!result.Succeeded)
-                {
-                    s = s + result.Errors.ToString();
-                }
-            }
-            catch (Exception e)
-            {
-                TempData["msg"] = e.Message.ToString() + " | " + s;
-            }
-
-
-
-
-            TempData["msg"] = $"ثبت نام شما با موفقیت انجام شد. ";
-
-
-
-            return View("LogIn");
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

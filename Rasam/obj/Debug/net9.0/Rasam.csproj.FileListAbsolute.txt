@@ -330,8 +330,8 @@ D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\al8f6qbqt4-ls0cm7fbkx.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\q9enffmc5g-029fn1i90v.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\bb9k2sr1yz-6wyhgd61tu.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\r3w6aue9tz-wlg3s01g4g.gz
-D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\ncgago7tw3-dhem8oeeji.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\uwnd8uhu31-oulo7uvaqs.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\xztlrmu0er-7smj2cmn8f.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\cylpntpfjj-oxhlwra4ef.gz
 D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\p4bimhir8i-uxvctxogxr.gz
+D:\VS\Rasam\Rasam\Rasam\obj\Debug\net9.0\compressed\lb797ryfw9-dhem8oeeji.gz
