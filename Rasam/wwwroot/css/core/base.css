@@ -1,0 +1,82 @@
+﻿/* =========================================================
+   Base
+   فونت، ریست، تنظیمات پایهٔ html/body و المان‌های فرم
+========================================================= */
+
+@font-face {
+    font-family: "IRANSansWeb";
+    src: url("../Font/IRANSansWeb.woff2") format("woff2");
+    font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-grad);
+    color: var(--text-color);
+    font-family: "IRANSansWeb", "Vazirmatn", Tahoma, Arial, sans-serif;
+    font-size: 16px;
+    transition: background .25s ease, color .25s ease;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-grad);
+    color: var(--text-color);
+    font-size: 16px;
+    transition: background .25s ease, color .25s ease;
+    direction: rtl;
+    font-family: "IRANSansWeb", "Vazirmatn", Tahoma, Arial, sans-serif !important;
+}
+
+body * {
+    font-family: "IRANSansWeb", "Vazirmatn", Tahoma, Arial, sans-serif !important;
+}
+
+button {
+    font-family: "IRANSansWeb", "Vazirmatn", Tahoma, Arial, sans-serif !important;
+    user-select: none;
+}
+
+input,
+textarea,
+select,
+option,
+table,
+svg,
+svg text {
+    font-family: "IRANSansWeb", "Vazirmatn", Tahoma, Arial, sans-serif !important;
+}
+
+button,
+input,
+textarea {
+    font-family: inherit;
+}
+
+select option {
+    background: var(--surface);
+    color: var(--text-color);
+}
+
+@media (max-width: 760px) {
+    html,
+    body {
+        overflow: auto;
+    }
+}
+
+body.modal-open {
+    overflow: hidden;
+}

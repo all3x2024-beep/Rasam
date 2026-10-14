@@ -1,0 +1,36 @@
+﻿/* =========================================================
+   Page alerts
+   نوار خطای جاوااسکریپت (برای عیب‌یابی) که بالای صفحه نمایش داده می‌شود
+========================================================= */
+
+.page-error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    max-height: 35vh;
+    overflow: auto;
+    padding: 8px 14px;
+    border-bottom: 2px solid #dc2626;
+    background: #fee2e2;
+    color: #991b1b;
+    font: 13px/1.7 Tahoma, sans-serif;
+    direction: rtl;
+    white-space: pre-wrap;
+}
+
+.page-error-banner-close {
+    float: left;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+html.dark .page-error-banner {
+    background: #450a0a;
+    color: #fecaca;
+    border-bottom-color: #f87171;
+}

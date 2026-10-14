@@ -1,0 +1,38 @@
+﻿/* =========================================================
+   Mersad report
+   گزارش خروجی مرصاد
+========================================================= */
+
+.mersad-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.mersad-row b {
+    white-space: nowrap;
+}
+
+.mersad-names {
+    margin: 4px 0 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-size: 12px;
+    color: #475569;
+    max-height: 120px;
+    overflow: auto;
+    word-break: break-word;
+}
+
+.dark .mersad-names {
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
+.mersad-names--plain {
+    max-height: none;
+}

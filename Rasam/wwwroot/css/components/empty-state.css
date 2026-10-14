@@ -1,0 +1,34 @@
+﻿/* =========================================================
+   Empty state
+   نمای خالی بودن لیست‌ها
+========================================================= */
+
+.empty-state {
+    padding: 40px 20px;
+    color: var(--muted);
+    text-align: center;
+    cursor: pointer;
+}
+
+.empty-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: var(--surface-alt);
+    font-size: 33px;
+}
+
+.empty-state h3 {
+    margin: 0 0 6px;
+    color: var(--text-color);
+    font-size: 17px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}

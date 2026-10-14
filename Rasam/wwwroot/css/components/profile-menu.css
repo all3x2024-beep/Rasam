@@ -1,0 +1,129 @@
+﻿/* =========================================================
+   Profile menu
+   منوی کاربر در هدر
+========================================================= */
+
+.profile-menu {
+    position: relative;
+    z-index: 100;
+}
+
+.profile-menu-toggle {
+    min-width: 44px;
+    width: auto;
+    padding: 0 14px;
+    gap: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-menu-icon {
+    font-size: 17px;
+    line-height: 1;
+}
+
+.profile-menu-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.profile-menu-toggle[aria-expanded="true"] {
+    background: var(--surface-alt);
+    border-color: var(--muted);
+}
+
+.profile-submenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: auto;
+    z-index: 10000;
+    display: none;
+    width: 190px;
+    min-width: 190px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 16px 38px rgba(15, 23, 42, .18);
+}
+
+.profile-submenu.show {
+    display: block;
+    animation: profileMenuIn .14s ease;
+}
+
+.profile-submenu-item {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 11px;
+    border-radius: 8px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease;
+}
+
+.profile-submenu-item:hover {
+    background: var(--surface-alt);
+    color: var(--heading);
+}
+
+.profile-submenu-danger {
+    color: #dc2626;
+}
+
+.profile-submenu-danger:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+html.dark .profile-submenu-danger {
+    color: #f87171;
+}
+
+html.dark .profile-submenu-danger:hover {
+    background: rgba(220, 38, 38, .12);
+    color: #fca5a5;
+}
+
+.profile-avatar {
+    border: 2px solid var(--border);
+    background: var(--surface-alt);
+}
+
+.profile-avatar-empty {
+    background: var(--surface-alt);
+    border: 2px solid var(--border);
+    color: var(--muted-2);
+}
+
+@keyframes profileMenuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-menu-toggle {
+        width: 44px;
+        padding: 0;
+    }
+
+    .profile-menu-name {
+        display: none;
+    }
+}

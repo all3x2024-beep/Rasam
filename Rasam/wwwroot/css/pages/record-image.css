@@ -1,0 +1,175 @@
+﻿/* =========================================================
+   Record image
+   پنل تصویر پروفایل در فرم رکورد
+========================================================= */
+
+.record-image-column {
+    min-height: 0;
+}
+
+.record-image-panel {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-alt);
+}
+
+.image-stage {
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    background: var(--surface);
+}
+
+.image-stage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.image-stage[hidden],
+.image-stage img[hidden],
+.image-stage-empty[hidden],
+.image-badge[hidden],
+.image-file-clear[hidden] {
+    display: none !important;
+}
+
+.image-stage-empty {
+    font-size: 32px;
+    line-height: 1;
+    color: var(--muted-2);
+}
+
+.image-side {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.image-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border: 1px solid var(--info-bd);
+    border-radius: 999px;
+    background: var(--info-bg);
+    color: var(--info-fg);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.image-badge.is-new {
+    border-color: var(--ok-bd);
+    background: var(--ok-bg);
+    color: var(--ok-fg);
+}
+
+.image-file-control {
+    position: relative;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.record-image-panel .image-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.record-image-column .record-image-panel .image-file-button {
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transform: none;
+    transition: background .15s ease, box-shadow .15s ease;
+}
+
+.record-image-column .record-image-panel .image-file-button:hover {
+    background: #1d4ed8;
+}
+
+.record-image-panel .image-file-input:focus-visible + .image-file-button {
+    outline: 2px solid var(--primary-text, var(--primary));
+    outline-offset: 2px;
+}
+
+.image-file-clear {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.image-file-clear:hover {
+    border-color: var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger-fg);
+}
+
+.image-file-status {
+    width: 100%;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+
+@media (max-width: 900px) {
+    .record-image-panel {
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 420px) {
+    .record-image-panel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .image-side {
+        align-items: center;
+        text-align: center;
+    }
+}

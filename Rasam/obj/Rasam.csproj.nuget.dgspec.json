@@ -51,6 +51,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "ExcelDataReader": {
+              "target": "Package",
+              "version": "[3.9.0, )"
+            },
+            "ExcelDataReader.DataSet": {
+              "target": "Package",
+              "version": "[3.9.0, )"
+            },
             "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.10, )"

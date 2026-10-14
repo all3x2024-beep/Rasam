@@ -1,16 +1,13 @@
-﻿using System.IO.Compression;
-using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rasam.Data;
 using Rasam.Models.SocialAccount;
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
 
 namespace Rasam.Controllers
 {
-    [Authorize]
-
     public class ProfileController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -103,7 +100,8 @@ namespace Rasam.Controllers
                         {
                             id = a.Id,
                             fileName = a.FileName,
-                            fileUrl = a.FileUrl
+                            fileUrl = a.FileUrl,
+                            createDate = a.CreateDate
                         })
                         .ToList()
                 })
@@ -1034,7 +1032,8 @@ namespace Rasam.Controllers
                         });
                     }
 
-                    if (Directory.Exists(oldFolder))
+                    if (!string.IsNullOrWhiteSpace(oldUsername) &&
+                        Directory.Exists(oldFolder))
                     {
                         Directory.Move(
      oldFolder,
@@ -1089,6 +1088,23 @@ namespace Rasam.Controllers
                     Directory.CreateDirectory(
                         newFolder
                     );
+                }
+
+
+                // =========================================================
+                // SYNC IMAGE FILE NAME (کد ملی؛ اگر نبود username)
+                // =========================================================
+
+                if (!string.IsNullOrWhiteSpace(existingProfile.Image) &&
+                    (profile.MyFile == null || profile.MyFile.Length == 0))
+                {
+                    existingProfile.Image =
+                        RenameProfileImageIfNeeded(
+                            existingProfile.Image,
+                            newFolder!,
+                            newUsername,
+                            existingProfile.NationalCode
+                        );
                 }
 
 
@@ -1221,6 +1237,8 @@ namespace Rasam.Controllers
             }
             catch (DbUpdateException)
             {
+                RollbackFolderRename(folderRenamed, newFolder, oldFolder);
+
                 return Conflict(new
                 {
                     success = false,
@@ -1230,21 +1248,7 @@ namespace Rasam.Controllers
             }
             catch (Exception ex)
             {
-                if (folderRenamed &&
-                    Directory.Exists(newFolder) &&
-                    !Directory.Exists(oldFolder))
-                {
-                    try
-                    {
-                        Directory.Move(
-                            newFolder,
-                            oldFolder
-                        );
-                    }
-                    catch
-                    {
-                    }
-                }
+                RollbackFolderRename(folderRenamed, newFolder, oldFolder);
 
                 return StatusCode(500, new
                 {
@@ -1362,6 +1366,81 @@ namespace Rasam.Controllers
             return
                 $"/uploads/profiles/" +
                 $"{usernameId}/{fileName}";
+        }
+
+        // اگر کد ملی (یا username) عوض شده باشد، نام فایل تصویر با آن هماهنگ می‌شود
+        private string RenameProfileImageIfNeeded(
+            string imageUrl,
+            string profileFolder,
+            string usernameId,
+            string? nationalCode)
+        {
+            try
+            {
+                var currentName = Path.GetFileName(imageUrl);
+
+                var extension = Path.GetExtension(currentName);
+
+                var desiredName =
+                    SafeFileName(
+                        NationalCodeName(nationalCode) ?? usernameId
+                    ) + extension.ToLowerInvariant();
+
+                var newUrl =
+                    $"/uploads/profiles/{usernameId}/{desiredName}";
+
+                if (string.Equals(
+                        currentName,
+                        desiredName,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    // فقط آدرس پوشه (در صورت تغییر username) هماهنگ می‌شود
+                    return newUrl;
+                }
+
+                var source = Path.Combine(profileFolder, currentName);
+                var target = Path.Combine(profileFolder, desiredName);
+
+                if (!System.IO.File.Exists(source) ||
+                    System.IO.File.Exists(target))
+                {
+                    // فایل مبدأ نیست یا نام مقصد اشغال است؛ تصویر دست‌نخورده می‌ماند
+                    return imageUrl;
+                }
+
+                System.IO.File.Move(source, target);
+
+                return newUrl;
+            }
+            catch
+            {
+                return imageUrl;
+            }
+        }
+
+        // برگرداندن نام پوشه وقتی ذخیرهٔ دیتابیس ناموفق بوده است
+        private static void RollbackFolderRename(
+            bool folderRenamed,
+            string? newFolder,
+            string? oldFolder)
+        {
+            if (!folderRenamed ||
+                string.IsNullOrWhiteSpace(newFolder) ||
+                string.IsNullOrWhiteSpace(oldFolder))
+                return;
+
+            if (Directory.Exists(newFolder) &&
+                !Directory.Exists(oldFolder))
+            {
+                try
+                {
+                    Directory.Move(newFolder, oldFolder);
+                }
+                catch
+                {
+                    // ناموفق بودن برگرداندن نباید خطای اصلی را بپوشاند.
+                }
+            }
         }
 
         // =========================================================

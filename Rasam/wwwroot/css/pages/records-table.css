@@ -1,0 +1,117 @@
+﻿/* =========================================================
+   Records table
+   دکمه‌های عملیات ردیف، چیپ‌های متا، ستون انتخاب
+========================================================= */
+
+.meta-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    max-width: 280px;
+}
+
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.meta-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 26px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.meta-empty {
+    font-size: 13px;
+}
+
+td.col-actions {
+    width: 84px;
+    white-space: nowrap;
+}
+
+.row-actions {
+    align-items: center;
+}
+
+.row-actions button {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+}
+
+.row-actions button:focus-visible {
+    outline: 2px solid var(--primary-text, var(--primary));
+    outline-offset: 2px;
+}
+
+.tag {
+    border: 1px solid var(--info-bd);
+    background: var(--info-bg);
+    color: var(--info-fg);
+}
+
+.meta-chip {
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--text-color);
+}
+
+.meta-chip.tag {
+    background: var(--ok-bg);
+    border-color: var(--ok-bd);
+    color: var(--ok-fg);
+}
+
+.meta-more {
+    background: var(--border);
+    color: var(--muted);
+}
+
+.meta-empty {
+    color: var(--muted-2);
+}
+
+.edit-btn {
+    color: var(--info-fg);
+    background: var(--info-bg);
+    border-color: var(--info-bd);
+}
+
+.edit-btn:hover {
+    background: var(--info-bd);
+}
+
+.delete-btn {
+    color: var(--danger-fg);
+    background: var(--danger-bg);
+    border-color: var(--danger-bd);
+}
+
+.delete-btn:hover {
+    background: var(--danger-bd);
+}
+
+.col-select {
+    width: 36px;
+    text-align: center;
+}
+
+/* ---------- Empty row inside the table ---------- */
+
+.table-empty-cell {
+    padding: 30px;
+    text-align: center;
+}

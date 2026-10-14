@@ -1,0 +1,118 @@
+﻿/* =========================================================
+   App layout
+   قالب کلی برنامه: پوسته، هدر، نوار وضعیت
+========================================================= */
+
+.container,
+.app-shell {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0 auto;
+    padding: 16px 22px 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-shell > .statusbar {
+    flex: 0 0 auto;
+}
+
+.app-bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 760px) {
+    .container,
+    .app-shell {
+        height: auto;
+        min-height: 100dvh;
+        padding: 10px 12px;
+    }
+
+    .app-main .card {
+        min-height: 480px;
+    }
+}
+
+.header {
+    position: relative;
+    flex: 0 0 auto;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background-color: var(--surface);
+    background-image: radial-gradient(circle at 0 0, rgba(59, 130, 246, .07) 0, rgba(59, 130, 246, .07) 110px, transparent 111px);
+    box-shadow: 0 12px 35px var(--shadow-soft);
+    overflow: visible;
+    z-index: 50;
+}
+
+.brand {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.brand-icon {
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 25px;
+    background: linear-gradient(135deg, #0f172a, #334155);
+    box-shadow: 0 9px 22px rgba(15, 23, 42, .18);
+}
+
+.brand-text {
+    min-width: 0;
+}
+
+.brand h1 {
+    margin: 0 0 3px;
+    color: var(--heading);
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+.brand p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}

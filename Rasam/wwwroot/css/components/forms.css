@@ -1,0 +1,129 @@
+﻿/* =========================================================
+   Forms
+   فیلدهای فرم، برچسب‌ها، textarea، تکمیل خودکار
+========================================================= */
+
+.input::placeholder,
+.search::placeholder,
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--muted-2);
+}
+
+.form-group:focus-within label {
+    color: var(--primary-text);
+}
+
+.field-hint {
+    color: var(--danger-fg);
+}
+
+.form-group input.invalid {
+    border-color: var(--danger-bd);
+    background: var(--danger-bg);
+}
+
+.autocomplete-wrap {
+    position: relative;
+}
+
+.autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    left: 0;
+    z-index: 20;
+    display: none;
+    max-height: 190px;
+    overflow-y: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, .16);
+}
+
+.autocomplete-list.show {
+    display: block;
+    animation: autocompleteIn .14s ease;
+}
+
+.autocomplete-item {
+    padding: 8px 11px;
+    color: var(--text-color);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+    background: var(--surface-alt);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--heading);
+}
+
+.input,
+select.input,
+textarea.input {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    outline: none;
+    color: var(--text-color);
+    background: var(--surface);
+    font-size: 13px;
+    line-height: 38px;
+    box-sizing: border-box;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+select.input option {
+    font-size: 13px;
+    padding: 4px 8px;
+    color: var(--text-color);
+}
+
+.input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--focus-ring) !important;
+    outline: none;
+}
+
+.modal select.input:not(.smart-select-native):not([multiple]) {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    cursor: pointer;
+    padding-left: 34px !important;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 12px center !important;
+}
+
+.modal select.input[multiple].smart-fallback-visible {
+    display: block !important;
+    min-height: 140px;
+}
+
+@keyframes autocompleteIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

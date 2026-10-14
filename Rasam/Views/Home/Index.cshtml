@@ -6,41 +6,50 @@
 
 
 <!-- =========================================================
-     گزارش خطاهای جاوااسکریپت (برای عیب‌یابی؛ بالای صفحه نمایش داده می‌شود)
+     گزارش خطاهای جاوااسکریپت (برای عیب‌یابی؛ استایل در css/components/alerts.css)
 ========================================================= -->
 <script>
     (function () {
         var shown = {};
+
         function show(msg) {
             if (shown[msg]) return;
-            shown[msg] = true;
+
             if (!document.body) {
                 document.addEventListener('DOMContentLoaded', function () { show(msg); });
-                shown[msg] = false;
                 return;
             }
+
+            shown[msg] = true;
+
             var box = document.getElementById('pageErrorBanner');
+
             if (!box) {
                 box = document.createElement('div');
                 box.id = 'pageErrorBanner';
-                box.dir = 'rtl';
-                box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;max-height:35vh;overflow:auto;background:#fee2e2;color:#991b1b;border-bottom:2px solid #dc2626;padding:8px 14px;font:13px/1.7 Tahoma,sans-serif;white-space:pre-wrap';
+                box.className = 'page-error-banner';
+
                 var close = document.createElement('button');
                 close.type = 'button';
+                close.className = 'page-error-banner-close';
                 close.textContent = '×';
-                close.style.cssText = 'float:left;border:0;background:none;font-size:20px;cursor:pointer;color:#991b1b';
                 close.onclick = function () { box.remove(); };
+
                 box.appendChild(close);
                 document.body.appendChild(box);
             }
+
             var line = document.createElement('div');
             line.textContent = '⚠ ' + msg;
             box.appendChild(line);
         }
+
         window.__reportPageError = show;
+
         window.addEventListener('error', function (e) {
             show('خطای جاوااسکریپت: ' + (e.message || 'نامشخص') + (e.lineno ? ' (خط ' + e.lineno + ')' : ''));
         });
+
         window.addEventListener('unhandledrejection', function (e) {
             var r = e.reason;
             show('خطای ناهمگام: ' + (r && r.message ? r.message : r));
@@ -435,6 +444,81 @@
 </div>
 
 <!-- =========================================================
+     GALLERY MODAL (گالری پیوست‌های هر ردیف)
+========================================================= -->
+<div class="modal" id="galleryModal">
+    <div class="modal-content gallery-modal-content">
+        <div class="modal-header">
+            <div>
+                <h3 id="galleryTitle">🖼️ گالری پیوست‌ها</h3>
+                <div class="modal-header-sub" id="gallerySub"></div>
+            </div>
+            <button class="close-btn modalCloseBtn" type="button">×</button>
+        </div>
+
+        <div class="modal-body gallery-body">
+
+            <div class="gal-toolbar">
+                <input id="gallerySearch" class="input gal-search" type="search" placeholder="🔎 جستجو در نام فایل..." autocomplete="off">
+
+                <select id="gallerySort" class="input gal-sort" aria-label="مرتب‌سازی">
+                    <option value="new">جدیدترین</option>
+                    <option value="old">قدیمی‌ترین</option>
+                    <option value="name">نام (الف تا ی)</option>
+                    <option value="type">نوع فایل</option>
+                </select>
+
+                <div class="gal-seg" id="galleryViewToggle" role="group" aria-label="نوع نمایش">
+                    <button type="button" data-view="grid" title="نمایش شبکه‌ای">▦</button>
+                    <button type="button" data-view="list" title="نمایش فهرستی">☰</button>
+                </div>
+
+                <label class="gal-size" id="gallerySizeWrap" title="اندازهٔ بند انگشتی">
+                    🔍
+                    <input type="range" id="gallerySize" min="90" max="240" step="10" value="130">
+                </label>
+            </div>
+
+            <div class="gal-chips" id="galleryChips"></div>
+
+            <div class="gal-selbar" id="gallerySelBar" hidden>
+                <span id="gallerySelCount"></span>
+                <span class="gal-sp"></span>
+                <button type="button" id="gallerySelAll">انتخاب همهٔ نتایج</button>
+                <button type="button" id="gallerySelDownload">⬇ دانلود</button>
+                <button type="button" id="gallerySelDelete" class="gal-danger">🗑 حذف</button>
+                <button type="button" id="gallerySelClear">لغو انتخاب</button>
+            </div>
+
+            <div class="gal-grid" id="galleryGrid"></div>
+
+            <div class="gal-empty" id="galleryEmpty" hidden></div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="galleryEditBtn" type="button">✏️ ویرایش رکورد / افزودن پیوست</button>
+            <button class="btn btn-secondary modalCloseBtn" type="button">بستن</button>
+        </div>
+    </div>
+</div>
+
+<div class="gal-lightbox" id="galleryLightbox" hidden role="dialog" aria-modal="true" aria-label="پیش‌نمایش پیوست">
+    <div class="gal-lb-top">
+        <div class="gal-lb-title" id="galleryLbTitle"></div>
+        <span id="galleryLbCount"></span>
+        <a class="gal-lb-btn" id="galleryLbDownload" href="#" download>⬇ دانلود</a>
+        <a class="gal-lb-btn" id="galleryLbOpen" href="#" target="_blank" rel="noopener">↗ باز کردن</a>
+        <button type="button" class="gal-lb-btn" id="galleryLbClose" aria-label="بستن">✕ بستن</button>
+    </div>
+    <div class="gal-lb-stage" id="galleryLbStage">
+        <button type="button" class="gal-lb-nav gal-lb-prev" id="galleryLbPrev" aria-label="قبلی">❯</button>
+        <button type="button" class="gal-lb-nav gal-lb-next" id="galleryLbNext" aria-label="بعدی">❮</button>
+        <div id="galleryLbContent"></div>
+    </div>
+</div>
+
+<!-- =========================================================
      ADD MODAL
 ========================================================= -->
 <div class="modal" id="addRecordModal">
@@ -759,298 +843,6 @@
         </form>
     </div>
 </div>
-<style>
-    /* =========================================================
-                       Graph extras (گزینه‌ها، آمار، راهنما، مسیر، تمام‌صفحه)
-                       کلاس‌های جدید با پیشوند gx- تا با graph.css تداخل نکنند
-                    ========================================================= */
-
-    #graphModal [hidden] {
-        display: none !important;
-    }
-
-    .gx-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 8px;
-    }
-
-    .gx-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 3px 10px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        background: var(--surface-alt);
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-        .gx-chip b {
-            color: var(--heading);
-            font-weight: 700;
-        }
-
-    .gx-inline-field {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: var(--muted);
-    }
-
-        .gx-inline-field .input {
-            width: 90px;
-            height: 30px;
-            padding: 0 8px;
-        }
-
-    .gx-path-bar {
-        border-color: var(--warn-bd);
-        background: var(--warn-bg);
-        color: var(--warn-fg);
-    }
-
-    .gx-options {
-        margin: 8px 0;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        background: var(--surface-alt);
-    }
-
-        .gx-options > summary {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 13px;
-            color: var(--heading);
-            user-select: none;
-        }
-
-        .gx-options[open] > summary {
-            border-bottom: 1px solid var(--border);
-        }
-
-    .gx-options-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 8px 14px;
-        padding: 10px 12px;
-        align-items: center;
-    }
-
-    .gx-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        font-size: 12px;
-        color: var(--muted);
-    }
-
-        .gx-field .input {
-            height: 32px;
-        }
-
-    .gx-check {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 12.5px;
-        color: var(--text-color);
-        cursor: pointer;
-    }
-
-    .graph-viewport {
-        position: relative;
-    }
-
-    .gx-legend {
-        position: absolute;
-        inset-inline-start: 10px;
-        bottom: 10px;
-        z-index: 3;
-        max-width: 230px;
-        max-height: 45%;
-        overflow: auto;
-        padding: 8px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        background: var(--surface);
-        box-shadow: var(--shadow-soft);
-        font-size: 12px;
-    }
-
-    .gx-legend-title {
-        margin: 2px 0 6px;
-        color: var(--muted);
-        font-size: 11px;
-    }
-
-        .gx-legend-title small {
-            color: var(--muted-2);
-        }
-
-        .gx-legend-title:not(:first-child) {
-            margin-top: 10px;
-        }
-
-    .gx-legend-item {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        width: 100%;
-        padding: 3px 4px;
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-        color: var(--text-color);
-        font: inherit;
-        text-align: start;
-        cursor: pointer;
-    }
-
-        .gx-legend-item:hover {
-            background: var(--surface-alt);
-        }
-
-        .gx-legend-item i {
-            flex: 0 0 10px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .gx-legend-item span {
-            flex: 1;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .gx-legend-item b {
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        .gx-legend-item.is-off {
-            opacity: .45;
-            text-decoration: line-through;
-        }
-
-        .gx-legend-item.is-static {
-            cursor: default;
-        }
-
-            .gx-legend-item.is-static:hover {
-                background: transparent;
-            }
-
-    .gx-type-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin: 6px 0;
-    }
-
-    .gx-type-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 2px 8px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        background: var(--surface-alt);
-        font-size: 11.5px;
-    }
-
-        .gx-type-chip i {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-    .gx-goto {
-        color: var(--primary-text);
-        text-decoration: none;
-        border-bottom: 1px dotted currentColor;
-    }
-
-    .gx-side-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-top: 10px;
-    }
-
-    /* برجسته‌سازی همسایه‌ها و مسیر */
-    .graph-viewport.has-selection .graph-node:not(.is-selected):not(.is-neighbor) {
-        opacity: .3;
-    }
-
-    .graph-viewport.has-selection .graph-edge:not(.is-active) {
-        opacity: .15;
-    }
-
-    .graph-viewport.has-selection .graph-edge-text {
-        opacity: .35;
-    }
-
-    .graph-viewport.has-path .graph-node:not(.is-path) {
-        opacity: .2;
-    }
-
-    .graph-viewport.has-path .graph-edge:not(.is-path) {
-        opacity: .1;
-    }
-
-    .graph-viewport.has-path .graph-edge-text {
-        opacity: .25;
-    }
-
-    .graph-edge.is-active {
-        stroke-width: 2.6px;
-    }
-
-    .graph-edge.is-path {
-        stroke-width: 3.6px;
-        stroke: #f59e0b !important;
-        opacity: 1 !important;
-    }
-
-    .graph-node.is-path .graph-node-circle,
-    .graph-node.is-path-start .graph-node-circle {
-        stroke: #f59e0b !important;
-        stroke-width: 4px !important;
-    }
-
-    /* تمام‌صفحه */
-    #graphModal .graph-modal-content.is-fullscreen {
-        width: 100vw !important;
-        max-width: none !important;
-        height: 100vh;
-        height: 100dvh;
-        max-height: none !important;
-        border-radius: 0 !important;
-    }
-
-        #graphModal .graph-modal-content.is-fullscreen .graph-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
-        }
-
-        #graphModal .graph-modal-content.is-fullscreen .graph-body-layout {
-            flex: 1;
-            min-height: 0;
-        }
-
-        #graphModal .graph-modal-content.is-fullscreen .graph-viewport {
-            height: auto !important;
-            min-height: 420px;
-        }
-</style>
 <!-- =========================================================
      GRAPH MODAL
 ========================================================= -->
@@ -1107,40 +899,19 @@
                 <!-- TOOLBAR -->
                 <div class="graph-toolbar">
                     <div class="graph-toolbar-group">
-                        <input type="text" id="graphSearchInput" class="input" placeholder="🔍 جستجوی گره..." style="width: 160px;">
+                        <input type="text" id="graphSearchInput" class="input graph-field-search" placeholder="🔍 جستجوی گره...">
 
-                        <select id="graphFilterRelation" class="input" style="width: 140px;">
+                        <select id="graphFilterRelation" class="input graph-field-filter">
                             <option value="">همه روابط</option>
                         </select>
 
-                        <select id="graphFilterTopic" class="input" style="width: 140px;">
+                        <select id="graphFilterTopic" class="input graph-field-filter">
                             <option value="">همه موضوعات</option>
                         </select>
 
-                        <select id="graphHubSelect" class="input" style="width: 150px;" title="پرارتباط‌ترین گره‌ها">
-                            <option value="">🏆 گره‌های کلیدی</option>
-                        </select>
-                    </div>
-
-                    <div class="graph-toolbar-group">
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphPhysicsToggleBtn">⏸️ توقف فیزیک</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphRelayoutBtn" title="چیدمان از نو محاسبه شود">🔀 چیدمان مجدد</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphResetViewBtn">🎯 بازنشانی نما</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphExportPngBtn" title="ذخیره تصویر PNG">🖼️ PNG</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphExportSvgBtn" title="ذخیره فایل برداری SVG">SVG</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="graphFullscreenBtn">⛶ تمام‌صفحه</button>
-                    </div>
-                </div>
-
-                <!-- OPTIONS -->
-                <details class="gx-options" id="graphOptions">
-                    <summary>⚙️ گزینه‌های نمایش و چیدمان</summary>
-
-                    <div class="gx-options-grid">
-
-                        <label class="gx-field">
-                            چیدمان
-                            <select id="graphLayoutSelect" class="input">
+                        <label class="graph-field">
+                            <span class="graph-field-label">چیدمان</span>
+                            <select id="graphLayoutSelect" class="input graph-field-layout">
                                 <option value="force">فیزیکی (خودکار)</option>
                                 <option value="circle">دایره‌ای</option>
                                 <option value="grid">شبکه‌ای</option>
@@ -1148,6 +919,21 @@
                                 <option value="topic">دسته‌بندی بر اساس موضوع</option>
                             </select>
                         </label>
+                    </div>
+
+                    <div class="graph-toolbar-group">
+                        <button type="button" class="btn btn-sm btn-secondary" id="graphPhysicsToggleBtn">⏸️ توقف فیزیک</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="graphResetViewBtn" title="بازگرداندن چیدمان و نما به حالت اولیه">🎯 بازنشانی</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="graphExportPngBtn" title="ذخیره تصویر PNG">🖼️ PNG</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="graphFullscreenBtn">⛶ تمام‌صفحه</button>
+                    </div>
+                </div>
+
+                <!-- OPTIONS -->
+                <details class="gx-options" id="graphOptions">
+                    <summary>⚙️ گزینه‌های نمایش</summary>
+
+                    <div class="gx-options-grid">
 
                         <label class="gx-field">
                             حداقل روابط هر گره
@@ -1182,14 +968,14 @@
 
                         <div class="gx-legend" id="graphLegend" hidden></div>
 
-                        <div id="graphContainer" style="width: 100%; height: 100%;"></div>
+                        <div id="graphContainer" class="graph-canvas"></div>
                     </div>
 
                     <!-- SIDEBAR DETAILS -->
                     <div class="graph-details-sidebar" id="graphSidebar">
                         <div class="graph-details-header">
-                            <h4 style="margin:0;">اطلاعات گره</h4>
-                            <button type="button" class="close-btn" id="graphCloseSidebarBtn" style="font-size:16px;">×</button>
+                            <h4>اطلاعات گره</h4>
+                            <button type="button" class="close-btn" id="graphCloseSidebarBtn">×</button>
                         </div>
                         <div id="graphSidebarContent">
                             <!-- به صورت پویا پر می‌شود -->
@@ -1353,385 +1139,6 @@
     }
 
 </script>
-
-<style>
-    /* fallback استایل انتخاب‌گر تگ — با :where کم‌وزن است و استایل اصلی سایت را override نمی‌کند */
-    .smart-select-native {
-        display: none !important;
-    }
-
-    :where(.smart-select-ui) {
-        position: relative;
-        width: 100%;
-    }
-
-    :where(.smart-select-head) {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 6px;
-        min-height: 42px;
-        padding: 6px 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        background: #fff;
-        cursor: pointer;
-    }
-
-    :where(.smart-select-chips) {
-        display: contents;
-    }
-
-    :where(.smart-select-chip) {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 2px 8px;
-        border-radius: 999px;
-        background: #e0e7ff;
-        font-size: 13px;
-    }
-
-    :where(.smart-select-chip button) {
-        border: 0;
-        background: none;
-        cursor: pointer;
-    }
-
-    :where(.smart-select-placeholder) {
-        color: #94a3b8;
-        flex: 1;
-    }
-
-    :where(.smart-select-chips:not(:empty) ~ .smart-select-placeholder) {
-        display: none;
-    }
-
-    :where(.smart-select-count) {
-        margin-inline-start: auto;
-        font-size: 12px;
-        color: #64748b;
-    }
-
-    :where(.smart-select-panel) {
-        display: none;
-        position: absolute;
-        inset-inline: 0;
-        top: calc(100% + 4px);
-        z-index: 60;
-        padding: 8px;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 8px 24px rgba(0,0,0,.15);
-    }
-
-    :where(.smart-select-ui.is-open .smart-select-panel) {
-        display: block;
-    }
-
-    :where(.smart-select-search) {
-        width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        margin-bottom: 6px;
-    }
-
-    :where(.smart-select-options) {
-        max-height: 220px;
-        overflow-y: auto;
-    }
-
-    :where(.smart-select-option) {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        width: 100%;
-        padding: 6px 8px;
-        border: 0;
-        background: none;
-        text-align: start;
-        cursor: pointer;
-        border-radius: 6px;
-    }
-
-    :where(.smart-select-option:hover) {
-        background: #f1f5f9;
-    }
-
-    :where(.smart-select-option.is-selected) {
-        background: #eef2ff;
-    }
-
-    :where(.smart-select-empty) {
-        padding: 8px;
-        color: #64748b;
-        font-size: 13px;
-    }
-
-    :where(.smart-select-error) {
-        padding: 8px;
-        color: #b91c1c;
-        font-size: 13px;
-    }
-    /* پنل تگ داخل جریان عادی فرم باز می‌شود تا overflow/z-index مودال آن را مخفی نکند */
-    .smart-select-ui {
-        display: block;
-        position: relative;
-    }
-
-        .smart-select-ui .smart-select-head {
-            cursor: pointer;
-        }
-
-        .smart-select-ui .smart-select-panel {
-            position: static !important;
-            display: none;
-            visibility: visible !important;
-            opacity: 1 !important;
-            transform: none !important;
-            max-height: none !important;
-            margin-top: 6px;
-            box-shadow: none !important;
-            pointer-events: auto !important;
-        }
-
-        .smart-select-ui.is-open .smart-select-panel {
-            display: block !important;
-        }
-
-        .smart-select-ui .smart-select-options {
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        .smart-select-ui .smart-select-option, .smart-select-ui .smart-select-search {
-            pointer-events: auto !important;
-        }
-
-    /* ظاهر کشویی برای selectهای فرم (موضوع، رابطه) تا شبیه کادر متنی نباشند */
-    .modal select.input:not(.smart-select-native):not([multiple]) {
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        cursor: pointer;
-        padding-left: 34px !important;
-        background-color: #fff;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-        background-repeat: no-repeat !important;
-        background-position: 12px center !important;
-    }
-
-    /* اگر انتخاب‌گر هوشمند ساخته نشد، select چندگانهٔ اصلی دیده و قابل‌استفاده می‌ماند */
-    .modal select.input[multiple].smart-fallback-visible {
-        display: block !important;
-        min-height: 140px;
-    }
-
-    /* ---------- پیوست‌ها ---------- */
-    .attach-box {
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 12px;
-        background: #fff;
-    }
-
-    .attach-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .attach-file-input {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .attach-pick-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 14px;
-        border-radius: 10px;
-        border: 1px dashed #94a3b8;
-        background: #f8fafc;
-        color: #334155;
-        cursor: pointer;
-        font-size: 13px;
-    }
-
-        .attach-pick-btn:hover {
-            background: #eef2f7;
-        }
-
-    .attach-status {
-        font-size: 12px;
-        color: #64748b;
-    }
-
-    .attach-sub-title {
-        margin: 12px 0 4px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-    }
-
-    .attach-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-        .attach-grid:empty {
-            display: none;
-        }
-
-    .attach-item {
-        position: relative;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #f8fafc;
-        text-align: center;
-        font-size: 11px;
-    }
-
-        .attach-item.is-new {
-            border-color: #22c55e;
-        }
-
-        .attach-item a {
-            color: inherit;
-            text-decoration: none;
-            display: block;
-        }
-
-    .attach-thumb {
-        width: 100%;
-        height: 80px;
-        object-fit: cover;
-        display: block;
-        background: #e2e8f0;
-    }
-
-    .attach-icon {
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-    }
-
-    .attach-name {
-        padding: 4px 6px 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        direction: ltr;
-        text-align: center;
-    }
-
-    .attach-size {
-        padding: 0 6px 4px;
-        color: #64748b;
-    }
-
-    .attach-remove {
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        width: 22px;
-        height: 22px;
-        border: 0;
-        border-radius: 50%;
-        background: rgba(220, 38, 38, .92);
-        color: #fff;
-        cursor: pointer;
-        line-height: 22px;
-        padding: 0;
-        font-size: 14px;
-    }
-
-    .dark .attach-box,
-    .dark .attach-item {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    .dark .attach-pick-btn {
-        background: #0f172a;
-        color: #e2e8f0;
-        border-color: #475569;
-    }
-
-    /* گزارش مرصاد */
-    .mersad-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid #e2e8f0;
-        font-size: 14px;
-    }
-
-        .mersad-row b {
-            white-space: nowrap;
-        }
-
-    .mersad-names {
-        margin: 4px 0 8px;
-        padding: 8px 10px;
-        border-radius: 8px;
-        background: #f8fafc;
-        font-size: 12px;
-        color: #475569;
-        max-height: 120px;
-        overflow: auto;
-        word-break: break-word;
-    }
-
-    .dark .mersad-names {
-        background: #1e293b;
-        color: #cbd5e1;
-    }
-
-    .col-select {
-        width: 36px;
-        text-align: center;
-    }
-
-    /* روابط ورودی در فرم ویرایش (فقط نمایش) */
-    .relation-incoming[hidden] {
-        display: none !important;
-    }
-
-    .relation-incoming {
-        margin-top: 8px;
-        padding: 8px 10px;
-        border: 1px dashed #cbd5e1;
-        border-radius: 10px;
-        background: #f8fafc;
-        font-size: 13px;
-        color: #475569;
-    }
-
-    .relation-incoming-title {
-        margin-bottom: 6px;
-        font-weight: 600;
-    }
-
-    .relation-incoming-item {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        padding: 2px 0;
-    }
-</style>
 
 <!-- =========================================================
      SCRIPT 02 · انتخاب‌گر چندگانه
@@ -4273,17 +3680,6 @@
             return false;
         }
 
-        const title =
-            String(
-                getValue(record, 'usernameId', 'UsernameId') ||
-                (
-                    String(getValue(record, 'firstName', 'FirstName') || '') +
-                    ' ' +
-                    String(getValue(record, 'lastName', 'LastName') || '')
-                ).trim() ||
-                id
-            );
-
         const deleteButton = button || pendingDeleteButton;
 
         if (deleteButton) {
@@ -5306,7 +4702,7 @@
                         <tr>
 
                             <td colspan="14"
-                                style="text-align:center;padding:30px;">
+                                class="table-empty-cell">
 
                                 رکوردی یافت نشد.
 
@@ -5632,6 +5028,8 @@
                                         ✏️
                                     </button>
 
+                                    ${window.RasamGallery ? window.RasamGallery.buttonHtml(item) : ''}
+
                                     <button type="button"
                                             class="graph-btn"
                                             data-graph-id="${escapeHtml(id)}"
@@ -5756,11 +5154,11 @@
         if (text) {
             G.msg.textContent = text;
             G.msg.hidden = false;
-            G.svg.style.visibility = 'hidden';
+            G.svg.classList.add('graph-svg-hidden');
         }
         else {
             G.msg.hidden = true;
-            G.svg.style.visibility = 'visible';
+            G.svg.classList.remove('graph-svg-hidden');
         }
     }
 
@@ -6618,11 +6016,11 @@
 
         G.nodes.forEach(n => {
             const t = n.g && n.g.querySelector('.graph-node-label');
-            if (t) t.style.display = o.nodeLabels ? '' : 'none';
+            if (t) t.classList.toggle('is-hidden', !o.nodeLabels);
         });
 
         G.edges.forEach(e => {
-            e.text.style.display = o.edgeLabels ? '' : 'none';
+            e.text.classList.toggle('is-hidden', !o.edgeLabels);
 
             if (o.arrows) e.path.setAttribute('marker-end', 'url(#' + graphMarkerFor(e.color) + ')');
             else e.path.removeAttribute('marker-end');
@@ -6673,7 +6071,7 @@
                 const off = G.hiddenTypes.has(type);
                 html += '<button type="button" class="gx-legend-item' + (off ? ' is-off' : '') +
                     '" data-legend-type="' + escapeHtml(type) + '">' +
-                    '<i style="background:' + G.typeColors.get(type) + '"></i>' +
+                    '<i style="--dot:' + G.typeColors.get(type) + '"></i>' +
                     '<span>' + escapeHtml(type) + '</span>' +
                     '<b>' + graphNum(counts.get(type) || 0) + '</b></button>';
             });
@@ -6684,32 +6082,13 @@
             html += '<div class="gx-legend-title">موضوع گره‌ها</div>';
 
             G.topicColors.forEach((color, topic) => {
-                html += '<div class="gx-legend-item is-static"><i style="background:' + color + '"></i>' +
+                html += '<div class="gx-legend-item is-static"><i style="--dot:' + color + '"></i>' +
                     '<span>' + escapeHtml(topic) + '</span></div>';
             });
         }
 
         box.innerHTML = html;
         box.hidden = !html;
-    }
-
-    /* ---------- گره‌های کلیدی (بیشترین روابط) ---------- */
-
-    function graphUpdateHubs() {
-
-        const sel = document.getElementById('graphHubSelect');
-        if (!sel) return;
-
-        const top = G.nodes
-            .filter(n => n.deg > 0)
-            .sort((a, b) => b.deg - a.deg || graphFa(a.label, b.label))
-            .slice(0, 10);
-
-        sel.innerHTML = '<option value="">🏆 گره‌های کلیدی</option>' +
-            top.map(n => '<option value="' + escapeHtml(n.id) + '">' +
-                escapeHtml(n.label) + ' · ' + graphNum(n.deg) + '</option>').join('');
-
-        sel.value = '';
     }
 
     function graphUpdatePhysicsButton() {
@@ -6728,7 +6107,6 @@
     function graphAfterRebuild() {
         graphUpdateStats();
         graphRenderLegend();
-        graphUpdateHubs();
         graphUpdatePhysicsButton();
     }
 
@@ -6933,11 +6311,6 @@
 
             const text = new XMLSerializer().serializeToString(built.svg);
 
-            if (kind === 'svg') {
-                graphDownloadBlob(new Blob([text], { type: 'image/svg+xml;charset=utf-8' }), 'svg');
-                return;
-            }
-
             const scale = Math.min(2, 8192 / Math.max(built.w, built.h));
             const url = URL.createObjectURL(new Blob([text], { type: 'image/svg+xml;charset=utf-8' }));
 
@@ -7012,7 +6385,6 @@
         const img = String(getValue(r, 'image', 'Image') || '');
         const full = (String(getValue(r, 'firstName', 'FirstName') || '') + ' ' +
                       String(getValue(r, 'lastName', 'LastName') || '')).trim();
-        const country = String(getValue(r, 'country', 'Country') || '');
 
         const outgoing = G.allEdges.filter(e => e.from === id);
         const incoming = G.allEdges.filter(e => e.to === id);
@@ -7036,7 +6408,7 @@
 
         const typeChips = Array.from(byType.entries())
             .sort((a, b) => b[1] - a[1])
-            .map(([t, c]) => '<span class="gx-type-chip"><i style="background:' + (G.typeColors.get(t) || '#94a3b8') + '"></i>' +
+            .map(([t, c]) => '<span class="gx-type-chip"><i style="--dot:' + (G.typeColors.get(t) || '#94a3b8') + '"></i>' +
                 escapeHtml(t) + ' <b>' + graphNum(c) + '</b></span>')
             .join('');
 
@@ -7046,10 +6418,6 @@
                 : '<div class="graph-details-empty-avatar">👤</div>') +
             '<h4 class="graph-details-name">' + escapeHtml(base.label) + '</h4>' +
             (full ? '<div class="graph-details-meta">نام: ' + escapeHtml(full) + '</div>' : '') +
-            (base.topic ? '<div class="graph-details-meta">موضوع: ' + escapeHtml(base.topic) + '</div>' : '') +
-            (country ? '<div class="graph-details-meta">کشور: ' + escapeHtml(country) + '</div>' : '') +
-            '<div class="graph-details-meta">تعداد روابط: ' + (outgoing.length + incoming.length) +
-                ' <small>(خروجی ' + outgoing.length + ' · ورودی ' + incoming.length + ')</small></div>' +
             (typeChips ? '<div class="gx-type-chips">' + typeChips + '</div>' : '') +
             (lines.length ? '<hr class="graph-details-sep">' + lines.join('') : '') +
             (hidden > 0 ? '<div class="graph-details-meta">و ' + hidden + ' رابطه دیگر…</div>' : '') +
@@ -7202,10 +6570,7 @@
         const container = document.getElementById('graphContainer');
         if (!container) return;
 
-        container.style.position = 'relative';
-
         const svg = svgEl('svg', { width: '100%', height: '100%' });
-        svg.style.display = 'block';
 
         const defs = svgEl('defs');
 
@@ -7227,8 +6592,7 @@
         svg.append(defs, layer);
 
         const msg = document.createElement('div');
-        msg.className = 'graph-message';
-        msg.style.cssText = 'position:absolute;inset:0;';
+        msg.className = 'graph-message graph-message-overlay';
         msg.hidden = true;
 
         container.append(svg, msg);
@@ -7320,12 +6684,13 @@
         $('graphZoomInBtn')?.addEventListener('click', () => centerZoom(1.25));
         $('graphZoomOutBtn')?.addEventListener('click', () => centerZoom(1 / 1.25));
 
-        $('graphResetViewBtn')?.addEventListener('click', () => graphFit());
-
-        $('graphRelayoutBtn')?.addEventListener('click', () => {
+        /* بازنشانی: چیدمان از نو محاسبه می‌شود و نما روی کل گراف قرار می‌گیرد */
+        $('graphResetViewBtn')?.addEventListener('click', () => {
             G.pos = new Map();
             graphRebuild(true);
         });
+
+        $('graphLayoutSelect')?.addEventListener('change', () => graphRefresh(true));
 
         $('graphPhysicsToggleBtn')?.addEventListener('click', function () {
             if (G.layoutMode !== 'force') return;
@@ -7341,15 +6706,6 @@
         $('graphFilterRelation')?.addEventListener('change', () => graphRefresh(true));
         $('graphFilterTopic')?.addEventListener('change', () => graphRefresh(true));
 
-        $('graphHubSelect')?.addEventListener('change', function () {
-            const n = G.nodeMap.get(this.value);
-            this.value = '';
-            if (!n) return;
-
-            graphCenterOn(n);
-            graphSelect(n.id);
-        });
-
         /* گزینه‌های نمایش و چیدمان */
 
         $('graphOptions')?.addEventListener('change', e => {
@@ -7361,9 +6717,6 @@
             }
             else if (id === 'graphOptNeighbors') {
                 graphApplyClasses();
-            }
-            else if (id === 'graphLayoutSelect') {
-                graphRefresh(true);
             }
             else {
                 /* اندازه، رنگ‌ها و حداقل روابط نیاز به ساخت مجدد دارند */
@@ -7392,7 +6745,6 @@
 
         $('graphPathClearBtn')?.addEventListener('click', graphClearPath);
         $('graphExportPngBtn')?.addEventListener('click', () => graphExport('png'));
-        $('graphExportSvgBtn')?.addEventListener('click', () => graphExport('svg'));
         $('graphFullscreenBtn')?.addEventListener('click', graphToggleFullscreen);
 
         /* جست‌وجو */
@@ -7768,9 +7120,8 @@
             });
         }
 
-        async function deleteExisting(id) {
-            if (!confirm('این پیوست برای همیشه حذف شود؟')) return;
-
+        // حذف پیوست از سرور و همهٔ حافظه‌های صفحه؛ true/false برمی‌گرداند
+        async function deleteById(id) {
             var body = new FormData();
             body.append('id', String(id));
             body.append('__RequestVerificationToken', token());
@@ -7782,26 +7133,38 @@
 
                 if (!res.ok || !data || !data.success) {
                     alert((data && data.message) || 'حذف پیوست انجام نشد.');
-                    return;
+                    return false;
                 }
 
-                if (currentRecord) {
-                    currentRecord.attachments = existingList().filter(function (a) {
-                        return String(a.id !== undefined ? a.id : a.Id) !== String(id);
-                    });
-                }
+                var keep = function (a) { return String(a.id !== undefined ? a.id : a.Id) !== String(id); };
 
-                renderExisting();
+                (window.records || []).forEach(function (r) {
+                    var l = r.attachments || r.Attachments;
+                    if (Array.isArray(l) && l.some(function (a) { return !keep(a); })) r.attachments = l.filter(keep);
+                });
+
+                if (currentRecord) currentRecord.attachments = existingList().filter(keep);
+
+                document.dispatchEvent(new CustomEvent('rasam:attachments-changed', { detail: { id: id } }));
+
+                return true;
             }
             catch (err) {
                 console.error(err);
                 alert('خطا در ارتباط با سرور.');
+                return false;
             }
+        }
+
+        async function deleteExisting(id) {
+            if (!confirm('این پیوست برای همیشه حذف شود؟')) return;
+            if (await deleteById(id)) renderExisting();
         }
 
         /* ---------- API برای بقیهٔ صفحه ---------- */
 
         window.RasamAttach = {
+            deleteById: deleteById,
             reset: reset,
             setExisting: function (record) {
                 currentRecord = record || null;
@@ -7886,7 +7249,7 @@
             var h = '';
 
             if (!ok && message) {
-                h += '<div class="mersad-names" style="max-height:none">' + esc(message) + '</div>';
+                h += '<div class="mersad-names mersad-names--plain">' + esc(message) + '</div>';
             }
 
             if (r) {
@@ -8001,220 +7364,425 @@
 </script>
 
 <!-- =========================================================
-     SCRIPT 21 · بارگذاری جایگزین (مستقل از بقیهٔ اسکریپت‌ها)
-     اگر اسکریپت‌های بالا به هر دلیل اجرا نشوند یا پیش از پر شدن موضوع/تگ
-     متوقف شوند، این بخش خودش داده را می‌گیرد و خطای واقعی را روی فرم نشان می‌دهد.
+     SCRIPT 23 · گالری پیوست‌ها (مستقل؛ داخل IIFE)
 ========================================================= -->
 <script>
     (function () {
         'use strict';
 
-        var URLS = {
-            topics: '@Url.Action("GetTopics", "MetaData")',
-            tags: '@Url.Action("GetTags", "MetaData")'
-        };
+        var IMG = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+        var VIDEO = ['.mp4', '.webm', '.mov', '.m4v', '.ogv'];
+        var AUDIO = ['.mp3', '.wav', '.ogg', '.m4a', '.aac'];
+        var DOCS = ['.pdf', '.doc', '.docx', '.rtf', '.odt', '.txt', '.md', '.xls', '.xlsx', '.csv', '.ods', '.ppt', '.pptx'];
+        var MEDIA = VIDEO.concat(AUDIO, ['.avi', '.mkv', '.wmv']);
 
-        function listFrom(raw) {
-            for (var i = 0; i < 6; i++) {
-                if (Array.isArray(raw)) return raw;
-                if (!raw || typeof raw !== 'object') return null;
-                var next = null;
-                Object.keys(raw).some(function (k) {
-                    if (Array.isArray(raw[k])) { next = raw[k]; return true; }
-                    return false;
-                });
-                if (!next) {
-                    var k2 = Object.keys(raw).filter(function (k) { return raw[k] && typeof raw[k] === 'object'; })[0];
-                    if (!k2) return null;
-                    next = raw[k2];
-                }
-                raw = next;
-            }
-            return Array.isArray(raw) ? raw : null;
-        }
+        var KINDS = [
+            { id: 'all', label: 'همه' },
+            { id: 'image', label: '🖼️ تصاویر' },
+            { id: 'doc', label: '📄 اسناد' },
+            { id: 'media', label: '🎞️ رسانه' },
+            { id: 'other', label: '📎 سایر' }
+        ];
 
-        function pick(o, names) {
-            var keys = Object.keys(o);
-            for (var i = 0; i < names.length; i++) {
-                for (var j = 0; j < keys.length; j++) {
-                    if (keys[j].toLowerCase() === names[i] && o[keys[j]] !== null && o[keys[j]] !== undefined && typeof o[keys[j]] !== 'object')
-                        return String(o[keys[j]]);
-                }
-            }
-            return '';
-        }
+        var PREF_KEY = 'rasam-gallery-prefs';
+        var prefs = { view: 'grid', size: 130, sort: 'new' };
 
-        function get(url) {
-            return fetch(url, { cache: 'no-store', credentials: 'same-origin' }).then(function (r) {
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-                return r.text();
-            }).then(function (text) {
-                var data;
-                try { data = JSON.parse(text); }
-                catch (e) { throw new Error('پاسخ JSON نیست (احتمالاً صفحهٔ ورود یا خطای سرور): ' + text.slice(0, 60)); }
-                var list = listFrom(data);
-                if (!list) throw new Error('ساختار پاسخ ناشناخته است');
-                return list.map(function (x) {
-                    return x && typeof x === 'object'
-                        ? { id: pick(x, ['id', 'value']), title: pick(x, ['title', 'name', 'text', 'label']) }
-                        : { id: String(x), title: String(x) };
-                }).filter(function (x) { return x.id !== '' && x.title !== ''; });
+        try {
+            var saved = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+            if (saved.view === 'grid' || saved.view === 'list') prefs.view = saved.view;
+            if (saved.size >= 90 && saved.size <= 240) prefs.size = saved.size;
+            if (['new', 'old', 'name', 'type'].indexOf(saved.sort) >= 0) prefs.sort = saved.sort;
+        } catch (e) { }
+
+        function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) { } }
+
+        var S = { recordId: null, query: '', kind: 'all', selected: {}, list: [], lb: -1 };
+
+        function $(id) { return document.getElementById(id); }
+
+        function esc(v) {
+            return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
             });
         }
 
-        function fillTopics(list, errorText) {
-            ['newRecordTopic', 'editRecordTopic'].forEach(function (id) {
-                var sel = document.getElementById(id);
-                if (!sel) return;
-                var keep = sel.value;
-                sel.innerHTML = '';
-                var ph = document.createElement('option');
-                ph.value = '';
-                ph.textContent = errorText ? ('⚠ ' + errorText) : 'انتخاب موضوع';
-                sel.appendChild(ph);
-                list.forEach(function (t) {
-                    var o = document.createElement('option');
-                    o.value = t.id; o.textContent = t.title;
-                    sel.appendChild(o);
-                });
-                if (keep) sel.value = keep;
-            });
+        function extOf(n) { var s = String(n || ''), i = s.lastIndexOf('.'); return i >= 0 ? s.slice(i).toLowerCase() : ''; }
+
+        function kindOf(ext) {
+            if (IMG.indexOf(ext) >= 0) return 'image';
+            if (DOCS.indexOf(ext) >= 0) return 'doc';
+            if (MEDIA.indexOf(ext) >= 0) return 'media';
+            return 'other';
         }
 
-        function fillTags(list, errorText) {
-            ['newRecordTag', 'editRecordTag'].forEach(function (id) {
-                var sel = document.getElementById(id);
-                if (!sel) return;
-                var chosen = Array.prototype.map.call(sel.selectedOptions, function (o) { return o.value; });
-                sel.innerHTML = '';
-                list.forEach(function (t) {
-                    var o = document.createElement('option');
-                    o.value = t.id; o.textContent = t.title;
-                    o.selected = chosen.indexOf(t.id) >= 0;
-                    sel.appendChild(o);
-                });
-                if (errorText) sel.dataset.error = errorText; else delete sel.dataset.error;
-                ensureTagUi(sel, list.length, errorText);
-            });
+        function iconFor(ext) {
+            if (ext === '.pdf') return '📕';
+            if (['.doc', '.docx', '.rtf', '.odt'].indexOf(ext) >= 0) return '📘';
+            if (['.xls', '.xlsx', '.csv', '.ods'].indexOf(ext) >= 0) return '📗';
+            if (['.ppt', '.pptx'].indexOf(ext) >= 0) return '📙';
+            if (['.zip', '.rar', '.7z', '.tar', '.gz'].indexOf(ext) >= 0) return '🗜️';
+            if (AUDIO.indexOf(ext) >= 0) return '🎵';
+            if (VIDEO.concat(['.avi', '.mkv', '.wmv']).indexOf(ext) >= 0) return '🎞️';
+            if (['.txt', '.md', '.log'].indexOf(ext) >= 0) return '📄';
+            return '📎';
         }
 
-        // اگر انتخاب‌گر هوشمند ساخته نشده یا کار نمی‌کند، select چندگانهٔ معمولی نمایش داده می‌شود
-        function ensureTagUi(sel, count, errorText) {
-            var ui = sel.nextElementSibling;
-            var hasUi = ui && ui.classList && ui.classList.contains('smart-select-ui');
-            if (hasUi && typeof window.refreshSmartMultiSelect === 'function') {
-                try {
-                    window.refreshSmartMultiSelect(sel);
-                    var ph = ui.querySelector('.smart-select-placeholder');
-                    if (ph) ph.textContent = errorText ? ('⚠ ' + errorText) : 'تگ‌ها را انتخاب کنید (' + count + ' تگ)';
-                    return;
-                } catch (e) { console.error(e); }
-            }
-            sel.classList.remove('smart-select-native');
-            sel.classList.add('smart-fallback-visible');
-            sel.size = Math.min(Math.max(count, 3), 8);
-            if (hasUi) ui.style.display = 'none';
-            if (errorText) sel.title = errorText;
-        }
-
-        var running = false;
-
-        function needsTopics() {
-            return ['newRecordTopic', 'editRecordTopic'].some(function (id) {
-                var s = document.getElementById(id);
-                return s && s.options.length < 2;
-            });
-        }
-
-        function needsTags() {
-            return ['newRecordTag', 'editRecordTag'].some(function (id) {
-                var s = document.getElementById(id);
-                if (!s) return false;
-                if (s.options.length === 0) return true;
-                var ui = s.nextElementSibling;
-                return !(ui && ui.classList && ui.classList.contains('smart-select-ui'));
-            });
-        }
-
-        function run() {
-            if (running) return;
-            var t = needsTopics(), g = needsTags();
-            if (!t && !g) return;
-            running = true;
-
-            if (typeof window.loadRecordTopics !== 'function' || typeof window.loadRecordTags !== 'function')
-                if (window.__reportPageError)
-                    window.__reportPageError('اسکریپت اصلی صفحه کامل اجرا نشده است؛ خطای بالا یا Console مرورگر (F12) علت را نشان می‌دهد.');
-
-            var jobs = [];
-
-            if (t) jobs.push(get(URLS.topics).then(function (l) { fillTopics(l); }, function (e) { fillTopics([], 'بارگذاری موضوعات ناموفق: ' + e.message); }));
-            if (g) jobs.push(get(URLS.tags).then(function (l) { fillTags(l); }, function (e) { fillTags([], 'بارگذاری تگ‌ها ناموفق: ' + e.message); }));
-
-            Promise.all(jobs).then(function () { running = false; }, function () { running = false; });
-        }
-
-        function schedule(ms) { setTimeout(run, ms); }
-
-        // اگر اسکریپت دیگری (مثلاً در Layout) بعد از پر شدن، selectها را دوباره خالی یا «در حال بارگذاری» کرد،
-        // فهرست‌ها از کش دوباره پر می‌شوند
-        var cache = { topics: null, tags: null };
-        var restoring = false;
-
-        function restore() {
-            if (restoring) return;
-            restoring = true;
+        function fmtDate(s) {
+            if (!s) return '';
             try {
-                var tp = ['newRecordTopic', 'editRecordTopic'].some(function (id) {
-                    var s = document.getElementById(id);
-                    return s && s.options.length < 2;
-                });
-                if (tp && cache.topics && cache.topics.length) fillTopics(cache.topics);
-                var tg = ['newRecordTag', 'editRecordTag'].some(function (id) {
-                    var s = document.getElementById(id);
-                    return s && s.options.length === 0;
-                });
-                if (tg && cache.tags && cache.tags.length) fillTags(cache.tags);
-            } finally { setTimeout(function () { restoring = false; }, 50); }
+                var d = new Date(String(s).replace(' ', 'T'));
+                return isNaN(d.getTime()) ? String(s).slice(0, 10) : d.toLocaleDateString('fa-IR');
+            } catch (e) { return String(s).slice(0, 10); }
         }
 
-        function watch() {
-            if (typeof MutationObserver !== 'function') return;
-            ['newRecordTopic', 'editRecordTopic', 'newRecordTag', 'editRecordTag'].forEach(function (id) {
-                var s = document.getElementById(id);
-                if (s) new MutationObserver(function () { setTimeout(restore, 0); }).observe(s, { childList: true });
+        function recId(r) { return String(r.id !== undefined ? r.id : r.Id); }
+
+        function getRecord() {
+            return (window.records || []).filter(function (r) { return recId(r) === String(S.recordId); })[0] || null;
+        }
+
+        function attachmentsOf(r) {
+            var l = r && (r.attachments || r.Attachments);
+            return Array.isArray(l) ? l : [];
+        }
+
+        function normalize(a) {
+            var name = a.fileName || a.FileName || '';
+            var url = a.fileUrl || a.FileUrl || '';
+            var ext = extOf(name) || extOf(url);
+            return {
+                id: String(a.id !== undefined ? a.id : a.Id),
+                name: name || 'file',
+                url: encodeURI(url),
+                date: a.createDate || a.CreateDate || '',
+                ext: ext,
+                kind: kindOf(ext)
+            };
+        }
+
+        /* ---------- دکمهٔ ردیف ---------- */
+
+        function buttonHtml(record) {
+            var n = attachmentsOf(record).length;
+            var id = recId(record);
+            return '<button type="button" class="graph-btn gallery-btn' + (n ? '' : ' is-empty') + '" data-gallery-id="' + esc(id) +
+                '" title="گالری پیوست‌ها (' + n + ')" aria-label="گالری پیوست‌ها">🖼️' +
+                (n ? '<span class="gallery-count">' + n + '</span>' : '') + '</button>';
+        }
+
+        function refreshBadges() {
+            (window.records || []).forEach(function (r) {
+                var btn = document.querySelector('tr[data-record-id="' + recId(r) + '"] .gallery-btn');
+                if (!btn) return;
+                var n = attachmentsOf(r).length;
+                btn.classList.toggle('is-empty', !n);
+                btn.title = 'گالری پیوست‌ها (' + n + ')';
+                var badge = btn.querySelector('.gallery-count');
+                if (n) {
+                    if (!badge) { badge = document.createElement('span'); badge.className = 'gallery-count'; btn.appendChild(badge); }
+                    badge.textContent = n;
+                } else if (badge) badge.remove();
             });
         }
 
-        // پس از هر بارگذاری موفق، آخرین فهرست در کش نگه داشته می‌شود
-        var _get = get;
-        get = function (url) {
-            return _get(url).then(function (l) {
-                if (url === URLS.topics) cache.topics = l;
-                if (url === URLS.tags) cache.tags = l;
-                return l;
+        /* ---------- لیست نمایشی (فیلتر + جستجو + مرتب‌سازی) ---------- */
+
+        function buildList() {
+            var all = attachmentsOf(getRecord()).map(normalize);
+            var counts = { all: all.length, image: 0, doc: 0, media: 0, other: 0 };
+            all.forEach(function (a) { counts[a.kind]++; });
+
+            var q = S.query.trim().toLowerCase();
+
+            var list = all.filter(function (a) {
+                return (S.kind === 'all' || a.kind === S.kind) && (!q || a.name.toLowerCase().indexOf(q) >= 0);
             });
-        };
 
-        // کش را از خود صفحه هم پر کن (اگر اسکریپت اصلی موفق بوده)
-        function primeFromPage() {
-            if (window.metaCache) {
-                if (window.metaCache.topics && !cache.topics) cache.topics = window.metaCache.topics;
-                if (window.metaCache.tags && !cache.tags) cache.tags = window.metaCache.tags;
-            }
+            list.sort(function (a, b) {
+                if (prefs.sort === 'old') return Number(a.id) - Number(b.id);
+                if (prefs.sort === 'name') return a.name.localeCompare(b.name, 'fa');
+                if (prefs.sort === 'type') return (a.ext.localeCompare(b.ext)) || a.name.localeCompare(b.name, 'fa');
+                return Number(b.id) - Number(a.id);
+            });
+
+            return { all: all, list: list, counts: counts };
         }
-        setInterval(primeFromPage, 1000);
 
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch);
-        else watch();
+        function renderChips(counts) {
+            $('galleryChips').innerHTML = KINDS.filter(function (k) { return k.id === 'all' || counts[k.id] > 0; })
+                .map(function (k) {
+                    return '<button type="button" class="gal-chip' + (S.kind === k.id ? ' is-active' : '') + '" data-kind="' + k.id + '">' +
+                        k.label + '<b>' + counts[k.id] + '</b></button>';
+                }).join('');
+        }
 
-        if (document.readyState === 'complete') schedule(1500);
-        else window.addEventListener('load', function () { schedule(1500); });
+        function cardHtml(a) {
+            var thumb = a.kind === 'image'
+                ? '<img loading="lazy" alt="' + esc(a.name) + '" src="' + esc(a.url) + '" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'gal-ficon\',textContent:\'🖼️\'}))">'
+                : '<span class="gal-ficon">' + iconFor(a.ext) + '<em>' + esc((a.ext || '').replace('.', '').toUpperCase()) + '</em></span>';
 
-        // هنگام باز شدن مودال‌ها هم بررسی می‌شود
-        document.addEventListener('click', function (e) {
-            if (e.target.closest && e.target.closest('#addRecordBtn, [data-edit-id]')) schedule(1200);
-        }, true);
+            var sub = [(a.ext || '').replace('.', '').toUpperCase(), fmtDate(a.date)].filter(Boolean).join(' • ');
+
+            return '<div class="gal-card' + (S.selected[a.id] ? ' is-selected' : '') + '" data-id="' + esc(a.id) + '">' +
+                '<label class="gal-check" title="انتخاب"><input type="checkbox" class="gal-sel"' + (S.selected[a.id] ? ' checked' : '') + '></label>' +
+                '<button type="button" class="gal-thumb" data-act="view" title="پیش‌نمایش">' + thumb + '</button>' +
+                '<div class="gal-meta"><div class="gal-name" title="' + esc(a.name) + '">' + esc(a.name) + '</div>' +
+                '<div class="gal-sub">' + esc(sub) + '</div></div>' +
+                '<div class="gal-actions">' +
+                '<button type="button" data-act="view" title="پیش‌نمایش">👁</button>' +
+                '<a href="' + esc(a.url) + '" download="' + esc(a.name) + '" title="دانلود">⬇</a>' +
+                '<button type="button" class="gal-del" data-act="delete" title="حذف">🗑</button>' +
+                '</div></div>';
+        }
+
+        function render() {
+            var rec = getRecord();
+            if (!rec) return;
+
+            var built = buildList();
+            S.list = built.list;
+
+            // انتخاب‌های حذف‌شده پاک شوند
+            var existing = {};
+            built.all.forEach(function (a) { existing[a.id] = true; });
+            Object.keys(S.selected).forEach(function (k) { if (!existing[k]) delete S.selected[k]; });
+
+            var name = [rec.firstName || rec.FirstName, rec.lastName || rec.LastName].filter(Boolean).join(' ');
+            $('galleryTitle').textContent = '🖼️ پیوست‌های ' + (rec.usernameId || rec.UsernameId || '') + (name ? ' — ' + name : '');
+            $('gallerySub').textContent = built.all.length
+                ? built.all.length + ' پیوست' + (built.list.length !== built.all.length ? ' (' + built.list.length + ' مورد مطابق فیلتر)' : '')
+                : 'پیوستی ثبت نشده است';
+
+            renderChips(built.counts);
+
+            var grid = $('galleryGrid');
+            grid.className = 'gal-grid' + (prefs.view === 'list' ? ' gal-list' : '');
+            grid.style.setProperty('--gal-size', prefs.size + 'px');
+            grid.innerHTML = built.list.map(cardHtml).join('');
+
+            var empty = $('galleryEmpty');
+            if (!built.all.length) {
+                empty.innerHTML = '<div class="gal-empty-icon">📭</div><div>این رکورد پیوستی ندارد.</div><div class="gal-empty-hint">برای افزودن، «ویرایش رکورد / افزودن پیوست» را بزنید.</div>';
+                empty.hidden = false;
+            } else if (!built.list.length) {
+                empty.innerHTML = '<div class="gal-empty-icon">🔎</div><div>موردی مطابق جستجو/فیلتر پیدا نشد.</div><button type="button" class="btn btn-secondary gal-empty-action" id="galleryResetFilters">پاک کردن فیلترها</button>';
+                empty.hidden = false;
+            } else empty.hidden = true;
+
+            document.querySelectorAll('#galleryViewToggle button').forEach(function (b) {
+                b.classList.toggle('is-active', b.getAttribute('data-view') === prefs.view);
+            });
+            $('gallerySizeWrap').hidden = prefs.view === 'list';
+            $('gallerySort').value = prefs.sort;
+            $('gallerySize').value = prefs.size;
+
+            updateSelBar();
+        }
+
+        function selectedIds() { return Object.keys(S.selected).filter(function (k) { return S.selected[k]; }); }
+
+        function updateSelBar() {
+            var n = selectedIds().length;
+            $('gallerySelBar').hidden = n === 0;
+            $('gallerySelCount').textContent = n + ' پیوست انتخاب شده';
+        }
+
+        /* ---------- باز و بسته کردن ---------- */
+
+        function open(recordId) {
+            S.recordId = recordId;
+            S.query = '';
+            S.kind = 'all';
+            S.selected = {};
+            $('gallerySearch').value = '';
+            closeLightbox();
+            render();
+            var modal = $('galleryModal');
+            if (typeof openModal === 'function') openModal(modal); else modal.classList.add('show');
+        }
+
+        /* ---------- پیش‌نمایش تمام‌صفحه ---------- */
+
+        function openLightbox(i) {
+            if (i < 0 || i >= S.list.length) return;
+            S.lb = i;
+            var a = S.list[i];
+            var box = $('galleryLb' + 'Content');
+            var stage = $('galleryLbStage');
+            stage.classList.remove('is-zoom');
+
+            var html;
+            if (a.kind === 'image') html = '<img alt="' + esc(a.name) + '" src="' + esc(a.url) + '">';
+            else if (a.ext === '.pdf') html = '<iframe title="' + esc(a.name) + '" src="' + esc(a.url) + '" class="gal-lb-frame"></iframe>';
+            else if (VIDEO.indexOf(a.ext) >= 0) html = '<video controls autoplay src="' + esc(a.url) + '"></video>';
+            else if (AUDIO.indexOf(a.ext) >= 0) html = '<audio controls autoplay src="' + esc(a.url) + '"></audio>';
+            else html = '<div class="gal-lb-fallback"><div class="gal-lb-icon">' + iconFor(a.ext) + '</div><div class="gal-lb-fallback-name">' + esc(a.name) +
+                '</div><div class="gal-lb-fallback-hint">پیش‌نمایش این نوع فایل ممکن نیست؛ از «دانلود» یا «باز کردن» استفاده کنید.</div></div>';
+
+            box.innerHTML = html;
+
+            $('galleryLbTitle').textContent = a.name;
+            $('galleryLbCount').textContent = (i + 1) + ' / ' + S.list.length;
+            var dl = $('galleryLbDownload'); dl.href = a.url; dl.setAttribute('download', a.name);
+            $('galleryLbOpen').href = a.url;
+            $('galleryLbPrev').hidden = $('galleryLbNext').hidden = S.list.length <= 1;
+            $('galleryLightbox').hidden = false;
+
+            // پیش‌بارگذاری همسایه‌ها
+            [i - 1, i + 1].forEach(function (j) {
+                var n = S.list[j];
+                if (n && n.kind === 'image') { var im = new Image(); im.src = n.url; }
+            });
+        }
+
+        function closeLightbox() {
+            S.lb = -1;
+            var lb = $('galleryLightbox');
+            if (lb) lb.hidden = true;
+            var c = $('galleryLbContent');
+            if (c) c.innerHTML = '';
+        }
+
+        function step(d) {
+            if (S.lb < 0 || !S.list.length) return;
+            openLightbox((S.lb + d + S.list.length) % S.list.length);
+        }
+
+        /* ---------- عملیات ---------- */
+
+        async function removeOne(id) {
+            var api = window.RasamAttach;
+            if (!api || !api.deleteById) { alert('امکان حذف در دسترس نیست.'); return false; }
+            return await api.deleteById(id);
+        }
+
+        function downloadMany(items) {
+            items.forEach(function (a, i) {
+                setTimeout(function () {
+                    var el = document.createElement('a');
+                    el.href = a.url; el.download = a.name;
+                    document.body.appendChild(el); el.click(); el.remove();
+                }, i * 350);
+            });
+        }
+
+        function byIds(ids) {
+            var all = attachmentsOf(getRecord()).map(normalize);
+            return all.filter(function (a) { return ids.indexOf(a.id) >= 0; });
+        }
+
+        /* ---------- رویدادها ---------- */
+
+        function bind() {
+            var modal = $('galleryModal');
+            if (!modal) return;
+
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest ? e.target.closest('[data-gallery-id]') : null;
+                if (btn) { e.preventDefault(); open(btn.getAttribute('data-gallery-id')); }
+            });
+
+            $('gallerySearch').addEventListener('input', function () { S.query = this.value; render(); });
+
+            $('gallerySort').addEventListener('change', function () { prefs.sort = this.value; savePrefs(); render(); });
+
+            $('gallerySize').addEventListener('input', function () {
+                prefs.size = parseInt(this.value, 10) || 130; savePrefs();
+                $('galleryGrid').style.setProperty('--gal-size', prefs.size + 'px');
+            });
+
+            $('galleryViewToggle').addEventListener('click', function (e) {
+                var b = e.target.closest('button[data-view]');
+                if (!b) return;
+                prefs.view = b.getAttribute('data-view'); savePrefs(); render();
+            });
+
+            $('galleryChips').addEventListener('click', function (e) {
+                var b = e.target.closest('.gal-chip');
+                if (!b) return;
+                S.kind = b.getAttribute('data-kind'); render();
+            });
+
+            $('galleryEmpty').addEventListener('click', function (e) {
+                if (e.target.id === 'galleryResetFilters') { S.query = ''; S.kind = 'all'; $('gallerySearch').value = ''; render(); }
+            });
+
+            $('galleryGrid').addEventListener('change', function (e) {
+                if (!e.target.classList.contains('gal-sel')) return;
+                var card = e.target.closest('.gal-card');
+                S.selected[card.getAttribute('data-id')] = e.target.checked;
+                card.classList.toggle('is-selected', e.target.checked);
+                updateSelBar();
+            });
+
+            $('galleryGrid').addEventListener('click', async function (e) {
+                var act = e.target.closest('[data-act]');
+                if (!act) return;
+                var card = act.closest('.gal-card');
+                var id = card.getAttribute('data-id');
+
+                if (act.getAttribute('data-act') === 'view') {
+                    var i = S.list.map(function (a) { return a.id; }).indexOf(id);
+                    openLightbox(i);
+                } else if (act.getAttribute('data-act') === 'delete') {
+                    var item = byIds([id])[0];
+                    if (!confirm('پیوست «' + (item ? item.name : '') + '» برای همیشه حذف شود؟')) return;
+                    await removeOne(id);
+                }
+            });
+
+            $('gallerySelAll').addEventListener('click', function () {
+                S.list.forEach(function (a) { S.selected[a.id] = true; }); render();
+            });
+            $('gallerySelClear').addEventListener('click', function () { S.selected = {}; render(); });
+            $('gallerySelDownload').addEventListener('click', function () { downloadMany(byIds(selectedIds())); });
+            $('gallerySelDelete').addEventListener('click', async function () {
+                var ids = selectedIds();
+                if (!ids.length) return;
+                if (!confirm(ids.length + ' پیوست برای همیشه حذف شود؟')) return;
+                var failed = 0;
+                for (var i = 0; i < ids.length; i++) { if (!(await removeOne(ids[i]))) failed++; }
+                if (failed) alert(failed + ' پیوست حذف نشد.');
+            });
+
+            $('galleryEditBtn').addEventListener('click', function () {
+                var id = S.recordId;
+                if (typeof closeModal === 'function') closeModal(modal); else modal.classList.remove('show');
+                var btn = document.querySelector('[data-edit-id="' + id + '"]');
+                if (btn) btn.click();
+            });
+
+            // پیش‌نمایش
+            $('galleryLbClose').addEventListener('click', closeLightbox);
+            $('galleryLbPrev').addEventListener('click', function () { step(-1); });
+            $('galleryLbNext').addEventListener('click', function () { step(1); });
+            $('galleryLbStage').addEventListener('click', function (e) {
+                if (e.target.tagName === 'IMG') this.classList.toggle('is-zoom');
+                else if (e.target === this) closeLightbox();
+            });
+
+            // کیبورد (فاز capture تا Esc مودال زیرین را نبندد). صفحه راست‌به‌چپ است: ← بعدی، → قبلی
+            window.addEventListener('keydown', function (e) {
+                if ($('galleryLightbox').hidden) return;
+                if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); closeLightbox(); }
+                else if (e.key === 'ArrowLeft') { e.preventDefault(); step(1); }
+                else if (e.key === 'ArrowRight') { e.preventDefault(); step(-1); }
+            }, true);
+
+            // اگر پیوستی (از فرم ویرایش یا همین گالری) حذف شد
+            document.addEventListener('rasam:attachments-changed', function () {
+                refreshBadges();
+                if (modal.classList.contains('show')) {
+                    render();
+                    if (S.lb >= 0) { if (S.list.length) openLightbox(Math.min(S.lb, S.list.length - 1)); else closeLightbox(); }
+                }
+            });
+        }
+
+        window.RasamGallery = { buttonHtml: buttonHtml, open: open, refreshBadges: refreshBadges };
+
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+        else bind();
     })();
 </script>
 
