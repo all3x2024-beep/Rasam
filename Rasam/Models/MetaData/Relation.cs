@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Rasam.Models.MetaData
 {
     public class Relation
     {
        [Key]
-       public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        public int Id { get; set; }
 
         [DisplayName("نوع ارتباط")]
         [Required(ErrorMessage = "نوع ارتباط الزامی است.")]

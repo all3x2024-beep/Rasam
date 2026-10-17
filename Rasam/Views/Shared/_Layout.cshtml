@@ -80,31 +80,24 @@
 
         <header class="header">
 
-            <a asp-controller="Home" asp-action="Index">
-                <div class="brand">
-
-                    <div class="brand-icon">
-                        🗂️
-                    </div>
-
-                    <div class="brand-text">
-
-                        <h1>
-                            سامانه بانک اطلاعات تصویری رصام
-                        </h1>
-
-                        <p>
-                            مدیریت اطلاعات فضای مجازی
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </a>
+<a asp-controller="Home" asp-action="Index"
+   style="text-decoration:none; color:inherit">
+    <div class="brand">
+        <div class="brand-icon">🗂️</div>
+        <div class="brand-text">
+            <h1>سامانه بانک اطلاعات تصویری رصام</h1>
+            <p>مدیریت اطلاعات فضای مجازی</p>
+        </div>
+    </div>
+</a>
 
 
             <div class="actions">
+
+                <button class="btn btn-toggle" title="درون‌ریزی"
+                        onclick="location.href='@Url.Action("Menu", "Import")'">
+                    📥
+                </button>
 
                 <button class="btn btn-toggle"
                         id="settingsBtn"

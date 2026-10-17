@@ -13,7 +13,6 @@ namespace Rasam.Models.SocialAccount
         [Key]
         public int Id { get; set; }
 
-        [Required]
         [PersonalData]
         [DisplayName("نام کاربری")]
         [MaxLength(100)]

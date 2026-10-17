@@ -435,7 +435,13 @@
                                        title="تغییر رمز عبور">
                                         <span>🗝️</span>
                                     </a>
-
+									<a class="btn btn-secondary"
+                                       asp-action="Access"
+									   asp-controller="Accounting"
+                                       asp-route-id="@item.Id"
+									   title="نقش !  ">
+										<span>*</span>
+									</a>
                                     <a 
                                             class="btn btn-secondary"
                                             data-bs-toggle="modal"

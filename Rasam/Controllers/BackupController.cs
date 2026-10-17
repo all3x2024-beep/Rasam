@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rasam.Data;
+using Rasam.Models.Accounting;
 using Rasam.Models.MetaData;
 using Rasam.Models.SocialAccount;
 
@@ -16,7 +17,7 @@ namespace Rasam.Controllers
     /// this controller only exposes the database as JSON and imports rows one profile at a time.
     /// Existing data is never deleted or overwritten – duplicates are skipped.
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin)]
     public class BackupController : Controller
     {
         // =====================================================

@@ -1,0 +1,94 @@
+@{
+ViewData["Title"] = "درون‌ریزی اطلاعات از اکسل";
+}
+
+<section class="card" dir="rtl">
+
+    <div class="toolbar">
+        <strong>📥 درون‌ریزی اطلاعات از اکسل</strong>
+    </div>
+
+    <div class="table-wrap">
+
+        <p class="bk-note">
+            <strong>راهنما:</strong>
+            مراحل را به ترتیب انجام دهید. پیوست‌ها، روابط و شبکه‌های اجتماعی
+            به شناسه‌ی پروفایل‌های ثبت‌شده نیاز دارند.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>بخش</th>
+                    <th>ستون‌های اکسل</th>
+                    <th>فایل‌های همراه</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>۱</td>
+                    <td><strong>👤 پروفایل‌ها</strong></td>
+                    <td dir="ltr">Id, UsernameId, PID, FirstName, LastName, NationalCode, Phone, Country, Image, TopicId, Theory, CreateDate, CreateBY, ModifyDate, ModifyBY</td>
+                    <td>پوشه‌ی پروفایل</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           asp-controller="Import"
+                           asp-action="ProfilesImport"
+                           title="درون‌ریزی پروفایل‌ها">
+                            📤 شروع
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>۲</td>
+                    <td><strong>📎 پیوست‌ها</strong></td>
+                    <td dir="ltr">Id, ProfileId, FilePath, CreateDate, CreateBY</td>
+                    <td>پوشه‌ی تصاویر و ویدیوها</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           asp-controller="Import"
+                           asp-action="ProfileAttachmentsImport"
+                           title="درون‌ریزی پیوست‌های پروفایل">
+                            📤 شروع
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>۳</td>
+                    <td><strong>🔗 روابط</strong></td>
+                    <td dir="ltr">Id, FromProfileId, ToProfileId, RelationId</td>
+                    <td>ندارد (نوع رابطه از قبل ثبت شده باشد)</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           asp-controller="Import"
+                           asp-action="ProfileRelationsImport"
+                           title="درون‌ریزی روابط پروفایل‌ها">
+                            📤 شروع
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>۴</td>
+                    <td><strong>🌐 شبکه‌های اجتماعی</strong></td>
+                    <td dir="ltr">Name, Username, ProfileId</td>
+                    <td>ندارد</td>
+                    <td>
+                        <a class="btn btn-primary"
+                           asp-controller="Import"
+                           asp-action="SocialMediaImport"
+                           title="درون‌ریزی شبکه‌های اجتماعی">
+                            📤 شروع
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</section>

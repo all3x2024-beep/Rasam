@@ -1,0 +1,189 @@
+﻿\xef\xbb\xbf@{
+    ViewData["Title"] = "ورود شبکه‌های اجتماعی از اکسل";
+}
+
+<section class="card" dir="rtl">
+
+    <div class="toolbar">
+        <strong>🌐 ورود شبکه‌های اجتماعی از اکسل</strong>
+    </div>
+
+    <div class="table-wrap">
+
+        @if (TempData["ImportError"] is string report)
+        {
+            <div class="bk-result" role="alert">
+                <div class="bk-log">
+                    <div class="error">
+                        <strong>⚠️ گزارش نهایی Import</strong>
+                    </div>
+
+                    @foreach (var line in report.Split(
+                                    '\n', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        <div class="error">@line.TrimEnd('\r')</div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (TempData["ImportSuccess"] is string success)
+        {
+            <div class="bk-result" role="status">
+                <div class="bk-log">
+                    <div class="success">
+                        <strong>✅ عملیات موفق</strong>
+                    </div>
+                    <div class="success">@success</div>
+                </div>
+            </div>
+        }
+
+        <p class="bk-note">
+            <strong>راهنما:</strong>
+            فایل اکسل باید این ستون‌ها را داشته باشد:
+            <code>Name</code>، <code>Username</code>،
+            <code>ProfileId</code> (نام <code>Profiled</code> هم پذیرفته می‌شود).
+            شناسه‌ی هر ردیف خودکار ساخته می‌شود.
+            پروفایل‌ها باید از قبل در دیتابیس وجود داشته باشند
+            (ابتدا پروفایل‌ها را Import کنید).
+            ردیف‌های تکراری (همان شبکه و حساب برای همان پروفایل) نادیده گرفته می‌شوند.
+        </p>
+
+        <form asp-controller="Import"
+              asp-action="SocialMediaImport"
+              method="post"
+              enctype="multipart/form-data"
+              id="socialImportForm">
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-group mb-3">
+                <label for="file" class="form-label">
+                    فایل اکسل (XLSX)
+                </label>
+
+                <div class="attach-controls">
+                    <input type="file"
+                           id="file"
+                           name="file"
+                           class="attach-file-input"
+                           accept=".xlsx"
+                           required />
+
+                    <label for="file" class="attach-pick-btn">
+                        📁 انتخاب فایل اکسل
+                    </label>
+
+                    <span id="fileInfo" class="attach-status">
+                        فایلی انتخاب نشده است.
+                    </span>
+                </div>
+
+                <p id="fileError"
+                   class="field-hint"
+                   hidden
+                   role="alert"></p>
+            </div>
+
+            <div class="toolbar">
+                <button type="submit"
+                        id="submitButton"
+                        class="btn btn-primary">
+                    📤 شروع Import
+                </button>
+
+                <button type="button"
+                        id="removeFilesBtn"
+                        class="btn btn-info">
+                    🗑️ حذف فایل انتخاب‌شده
+                </button>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const fileInput = document.getElementById('file');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileError = document.getElementById('fileError');
+            const form = document.getElementById('socialImportForm');
+            const submitButton = document.getElementById('submitButton');
+            const removeFilesBtn = document.getElementById('removeFilesBtn');
+
+            let isSubmitting = false;
+
+            function showError(message) {
+                fileError.textContent = message;
+                fileError.hidden = false;
+            }
+
+            function clearError() {
+                fileError.textContent = '';
+                fileError.hidden = true;
+            }
+
+            function validateExcel() {
+                clearError();
+                fileInput.setCustomValidity('');
+
+                const file = fileInput.files?.[0];
+
+                if (!file) {
+                    showError('فایل اکسل را انتخاب کنید.');
+                    fileInput.setCustomValidity('فایل اکسل الزامی است.');
+                    return false;
+                }
+
+                if (!file.name.toLowerCase().endsWith('.xlsx')) {
+                    showError('فرمت فایل باید XLSX باشد.');
+                    fileInput.setCustomValidity('فرمت فایل باید XLSX باشد.');
+                    return false;
+                }
+
+                if (file.size === 0) {
+                    showError('فایل اکسل خالی است.');
+                    fileInput.setCustomValidity('فایل اکسل خالی است.');
+                    return false;
+                }
+
+                fileInfo.textContent =
+                    `فایل: ${file.name} | حجم: ${(file.size / 1048576).toFixed(2)} MB`;
+
+                return true;
+            }
+
+            fileInput.addEventListener('change', validateExcel);
+
+            removeFilesBtn.addEventListener('click', () => {
+                if (isSubmitting) return;
+
+                fileInput.value = '';
+                fileInfo.textContent = 'فایلی انتخاب نشده است.';
+                clearError();
+                fileInput.setCustomValidity('');
+            });
+
+            form.addEventListener('submit', event => {
+                if (isSubmitting) {
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!validateExcel()) {
+                    event.preventDefault();
+                    form.reportValidity();
+                    return;
+                }
+
+                isSubmitting = true;
+                submitButton.disabled = true;
+                removeFilesBtn.disabled = true;
+                submitButton.textContent = '⏳ در حال پردازش...';
+            });
+        })();
+    </script>
+}

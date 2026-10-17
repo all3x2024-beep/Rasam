@@ -1,0 +1,77 @@
+@model Rasam.Models.Accounting.UserAccessViewModel
+@using Rasam.Models.Accounting
+
+@{
+    ViewData["Title"] = "سطح دسترسی کاربر";
+}
+
+<section class="card" dir="rtl">
+
+    <div class="toolbar">
+        <strong>🔐 سطح دسترسی: @Model.UserName</strong>
+    </div>
+
+    <div class="table-wrap">
+
+        <form asp-action="Access" method="post" id="accessForm">
+
+            <input type="hidden" asp-for="UserId" />
+
+            <div class="form-group">
+                <label for="Role">سطح دسترسی</label>
+
+                <select asp-for="Role" class="input">
+                    <option value="@AppRoles.Admin">مدیر — دسترسی کامل</option>
+                    <option value="@AppRoles.Editor">ویرایشگر — مشاهده و ویرایش رکوردها</option>
+                    <option value="@AppRoles.Viewer">مشاهده‌گر — فقط موارد تیک‌خورده</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>مشاهده‌گر چه چیزهایی را ببیند؟</label>
+
+                @foreach (var p in Permissions.All)
+                {
+                    <label>
+                        <input type="checkbox"
+                               name="Allowed"
+                               value="@p.Key"
+                               data-perm
+                               @(Model.Allowed.Contains(p.Key) ? "checked" : "") />
+                        @p.Title
+                    </label>
+                }
+            </div>
+
+            <p class="bk-note" id="permNote">
+                مدیر و ویرایشگر همهٔ موارد بالا را می‌بینند؛ تیک‌ها فقط برای مشاهده‌گر اعمال می‌شود.
+                تغییر دسترسی از ورود بعدی کاربر اعمال می‌شود.
+            </p>
+
+            <div class="toolbar">
+                <button type="submit" class="btn btn-primary">💾 ذخیره</button>
+                <a class="btn btn-info" asp-action="UserIndex">بازگشت</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const role = document.getElementById('Role');
+            const boxes = document.querySelectorAll('[data-perm]');
+
+            function sync() {
+                const isViewer = role.value === 'Viewer';
+                boxes.forEach(b => { b.disabled = !isViewer; });
+            }
+
+            role.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}

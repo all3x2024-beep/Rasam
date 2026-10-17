@@ -95,58 +95,63 @@ namespace Rasam.Controllers
             return RedirectToAction("UserIndex", "Accounting");
         }
 
-        public async Task<IActionResult> Role(string? id)
-        {
-            var role = await _roleManager.FindByIdAsync(id);
-            return View(role);
-
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Role([FromForm] Role item)
-        {
-            var user = await _UserManager.FindByIdAsync(item.TempUserId);
-            var result = await _UserManager.AddToRoleAsync(user, item.Name);
-
-
-
-            if (result.Succeeded)
-            {
-                ViewBag.Message = "نقش با موفقیت به کاربر اعطا شد.";
-                return RedirectToAction("UserIndex", "Accounting");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ViewBag.Message = error.Description;
-            }
-            return RedirectToAction("UserIndex", "Accounting");
-        }
 
 
         [Authorize(Roles = AppRoles.Admin)]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetRole(string userId, string role)
+        [HttpGet]
+        public async Task<IActionResult> Access(string id)
         {
-            if (role != AppRoles.Admin && role != AppRoles.Operator && role != AppRoles.Viewer)
-                return BadRequest(new { success = false, message = "نقش نامعتبر است." });
+            var user = await _UserManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
 
-            var user = await _UserManager.FindByIdAsync(userId);
-            if (user == null)
-                return NotFound(new { success = false, message = "کاربر پیدا نشد." });
+            var roles = await _UserManager.GetRolesAsync(user);
+            var claims = await _UserManager.GetClaimsAsync(user);
+
+            return View(new UserAccessViewModel
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Role = roles.FirstOrDefault() ?? AppRoles.Viewer,
+                Allowed = claims.Where(c => c.Type == Permissions.ClaimType).Select(c => c.Value).ToList()
+            });
+        }
+
+        [Authorize(Roles = AppRoles.Admin)]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Access(UserAccessViewModel model)
+        {
+            var user = await _UserManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound();
+
+            if (!AppRoles.All.Contains(model.Role)) return BadRequest();
 
             var current = await _UserManager.GetRolesAsync(user);
 
             // ادمین آخر نباید نقشش را از دست بدهد
-            if (current.Contains(AppRoles.Admin) && role != AppRoles.Admin &&
+            if (current.Contains(AppRoles.Admin) && model.Role != AppRoles.Admin &&
                 (await _UserManager.GetUsersInRoleAsync(AppRoles.Admin)).Count <= 1)
-                return BadRequest(new { success = false, message = "حداقل یک ادمین باید باقی بماند." });
+            {
+                ModelState.AddModelError("", "حداقل یک مدیر باید باقی بماند.");
+                return View(model);
+            }
 
             await _UserManager.RemoveFromRolesAsync(user, current);
-            await _UserManager.AddToRoleAsync(user, role);
-            await _UserManager.UpdateSecurityStampAsync(user);
+            await _UserManager.AddToRoleAsync(user, model.Role);
 
-            return Json(new { success = true });
+            // تیک‌ها فقط برای مشاهده‌گر ذخیره می‌شوند
+            var oldClaims = (await _UserManager.GetClaimsAsync(user))
+                .Where(c => c.Type == Permissions.ClaimType).ToList();
+            await _UserManager.RemoveClaimsAsync(user, oldClaims);
+
+            if (model.Role == AppRoles.Viewer)
+            {
+                var valid = (model.Allowed ?? new()).Where(k => Permissions.All.Any(p => p.Key == k));
+                await _UserManager.AddClaimsAsync(user,
+                    valid.Select(k => new System.Security.Claims.Claim(Permissions.ClaimType, k)));
+            }
+
+            await _UserManager.UpdateSecurityStampAsync(user);   // با ورود بعدی اعمال می‌شود
+            return RedirectToAction("UserIndex");
         }
 
         [Authorize]

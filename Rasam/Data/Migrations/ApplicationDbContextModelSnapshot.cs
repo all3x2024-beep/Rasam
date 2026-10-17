@@ -165,9 +165,9 @@ namespace Rasam.Data.Migrations
                         new
                         {
                             Id = "a1000000-0000-0000-0000-000000000002",
-                            ConcurrencyStamp = "role-operator-1",
-                            Name = "Operator",
-                            NormalizedName = "OPERATOR"
+                            ConcurrencyStamp = "role-editor-1",
+                            Name = "Editor",
+                            NormalizedName = "EDITOR"
                         },
                         new
                         {
@@ -414,7 +414,6 @@ namespace Rasam.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UsernameId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -423,7 +422,8 @@ namespace Rasam.Data.Migrations
                     b.HasIndex("TopicId");
 
                     b.HasIndex("UsernameId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UsernameId] IS NOT NULL");
 
                     b.ToTable("Profile");
                 });

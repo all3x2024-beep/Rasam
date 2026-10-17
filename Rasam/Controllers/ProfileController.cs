@@ -283,43 +283,57 @@ namespace Rasam.Controllers
             return null;
         }
 
-        // مسیر فیزیکی پیوست؛ فقط داخل wwwroot/uploads/profiles پذیرفته می‌شود
+        // مسیر ذخیره‌ی فایل‌ها (بر پایه‌ی Id پروفایل):
+        //   تصویر پروفایل: wwwroot/uploads/{Id}/profile/{نام فایل}
+        //   پیوست‌ها:      wwwroot/uploads/{Id}/attachment/{نام فایل}
+        private string WebRoot =>
+            string.IsNullOrWhiteSpace(_environment.WebRootPath)
+                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
+                : _environment.WebRootPath;
+
+        private string ProfileIdRoot(int profileId) =>
+            Path.Combine(WebRoot, "uploads", profileId.ToString());
+
+        private string ProfileDir(int profileId) =>
+            Path.Combine(ProfileIdRoot(profileId), "profile");
+
+        private string AttachmentDir(int profileId) =>
+            Path.Combine(ProfileIdRoot(profileId), "attachment");
+
+        // مسیر فیزیکی پیوست؛ فقط داخل wwwroot پذیرفته می‌شود (مسیرهای جدید و قدیمی)
         private string? ResolveAttachmentPath(ProfileAttachment attachment)
         {
-            var root =
-                Path.GetFullPath(
-                    Path.Combine(
-                        _environment.WebRootPath,
-                        "uploads",
-                        "profiles"
-                    )
-                ) + Path.DirectorySeparatorChar;
+            var webRoot = _environment.WebRootPath;
 
-            string? candidate = attachment.FilePath;
+            if (string.IsNullOrWhiteSpace(webRoot))
+                webRoot = Path.Combine(_environment.ContentRootPath, "wwwroot");
 
-            if (string.IsNullOrWhiteSpace(candidate) ||
-                !System.IO.File.Exists(candidate))
+            // 1) FilePath فیزیکی که هنگام Import ذخیره شده
+            if (!string.IsNullOrWhiteSpace(attachment.FilePath) &&
+                Path.IsPathRooted(attachment.FilePath) &&
+                System.IO.File.Exists(attachment.FilePath))
             {
-                candidate = string.IsNullOrWhiteSpace(attachment.FileUrl)
-                    ? null
-                    : Path.Combine(
-                        _environment.WebRootPath,
-                        attachment.FileUrl
-                            .TrimStart('/', '\\')
-                            .Replace('/', Path.DirectorySeparatorChar)
-                    );
+                return attachment.FilePath;
             }
 
-            if (candidate == null)
+            // 2) مسیر نسبی از FileUrl، مثل /12/attachment/a.jpg (یا مسیرهای قدیمی /uploads/...)
+            var rel = !string.IsNullOrWhiteSpace(attachment.FileUrl)
+                ? attachment.FileUrl
+                : attachment.FilePath;
+
+            if (string.IsNullOrWhiteSpace(rel))
                 return null;
 
-            var full = Path.GetFullPath(candidate);
+            rel = Uri.UnescapeDataString(rel).Replace('\\', '/').TrimStart('/');
 
-            return full.StartsWith(root, StringComparison.OrdinalIgnoreCase)
-                ? full
-                : null;
+            var full = Path.GetFullPath(Path.Combine(webRoot, rel));
+
+            // جلوگیری از خروج از wwwroot
+            if (!full.StartsWith(Path.GetFullPath(webRoot), StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return full;
         }
-
         // =========================================================
         // IsValidUsernameId
         // =========================================================
@@ -369,18 +383,14 @@ namespace Rasam.Controllers
                     });
                 }
 
-                if (string.IsNullOrWhiteSpace(profile.UsernameId))
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "شناسه کاربری الزامی است."
-                    });
-                }
+                // شناسه رکورد (UsernameId) اختیاری است؛ خالی = null
+                profile.UsernameId =
+                    string.IsNullOrWhiteSpace(profile.UsernameId)
+                        ? null
+                        : profile.UsernameId.Trim();
 
-                profile.UsernameId = profile.UsernameId.Trim();
-
-                if (!IsValidUsernameId(profile.UsernameId))
+                if (profile.UsernameId != null &&
+                    !IsValidUsernameId(profile.UsernameId))
                 {
                     return BadRequest(new
                     {
@@ -394,6 +404,7 @@ namespace Rasam.Controllers
                 // =========================================================
 
                 var usernameExists =
+                    profile.UsernameId != null &&
                     await _context.Profile
                         .AnyAsync(x => x.UsernameId == profile.UsernameId);
 
@@ -510,17 +521,11 @@ namespace Rasam.Controllers
                 // PROFILE FOLDER
                 // =========================================================
 
-                var profileFolder =
-                    Path.Combine(
-                        _environment.WebRootPath,
-                        "uploads",
-                        "profiles",
-                        profile.UsernameId
-                    );
+                var profileFolder = ProfileDir(profile.Id);
+                var attachmentFolder = AttachmentDir(profile.Id);
 
-                createdProfileFolder = profileFolder;
-
-                Directory.CreateDirectory(profileFolder);
+                // در صورت خطا کل پوشه‌ی این پروفایل پاک می‌شود
+                createdProfileFolder = ProfileIdRoot(profile.Id);
 
                 // =========================================================
                 // MAIN PROFILE IMAGE
@@ -533,7 +538,8 @@ namespace Rasam.Controllers
                         await SaveProfileImageAsync(
                             profile.MyFile,
                             profileFolder,
-                            profile.UsernameId,
+                            profile.Id,
+                            profile.UsernameId ?? profile.Id.ToString(),
                             profile.NationalCode
                         );
                 }
@@ -546,6 +552,8 @@ namespace Rasam.Controllers
                 if (profile.AttachmentsFiles != null &&
                     profile.AttachmentsFiles.Count > 0)
                 {
+                    Directory.CreateDirectory(attachmentFolder);
+
                     foreach (var file in profile.AttachmentsFiles)
                     {
                         if (file == null ||
@@ -560,7 +568,7 @@ namespace Rasam.Controllers
 
                         var physicalPath =
                             Path.Combine(
-                                profileFolder,
+                                attachmentFolder,
                                 storedFileName
                             );
 
@@ -587,9 +595,8 @@ namespace Rasam.Controllers
                                     physicalPath,
 
                                 FileUrl =
-                                    $"/uploads/profiles/" +
-                                    $"{profile.UsernameId}/" +
-                                    $"{storedFileName}",
+                                    $"/uploads/{profile.Id}/attachment/" +
+                                    storedFileName,
 
                                 CreateDate =
                                     DateTime.Now.ToString(
@@ -680,12 +687,18 @@ namespace Rasam.Controllers
                 }
 
                 // مسیر فولدر پروفایل
-                var profileFolder = Path.Combine(
-                    _environment.WebRootPath,
-                    "uploads",
-                    "profiles",
-                    profile.UsernameId ?? string.Empty
-                );
+                // پوشه‌ی جدید بر پایه‌ی Id
+                var idFolder = ProfileIdRoot(profile.Id);
+
+                // پوشه‌ی قدیمی (قبل از تغییر مسیر)؛ فقط اگر شناسه کاربری خالی نباشد
+                var legacyFolder =
+                    string.IsNullOrWhiteSpace(profile.UsernameId)
+                        ? null
+                        : Path.Combine(
+                            WebRoot,
+                            "uploads",
+                            "profiles",
+                            profile.UsernameId.Trim());
 
                 // حذف تصویر اصلی
                 DeleteImage(profile.Image);
@@ -734,15 +747,16 @@ namespace Rasam.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // حذف فولدر
-                if (Directory.Exists(profileFolder))
+                // حذف پوشه‌ها
+                foreach (var folder in new[] { idFolder, legacyFolder })
                 {
+                    if (string.IsNullOrWhiteSpace(folder) ||
+                        !Directory.Exists(folder))
+                        continue;
+
                     try
                     {
-                        Directory.Delete(
-                            profileFolder,
-                            true
-                        );
+                        Directory.Delete(folder, true);
                     }
                     catch
                     {
@@ -786,11 +800,6 @@ namespace Rasam.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = 209715200)]
         public async Task<IActionResult> Update(Profile profile, List<int>? TagIds, List<int>? SocialMediaIds)
         {
-            bool folderRenamed = false;
-
-            string? oldFolder = null;
-            string? newFolder = null;
-
             try
             {
                 // =========================================================
@@ -807,19 +816,14 @@ namespace Rasam.Controllers
                 }
 
 
-                if (string.IsNullOrWhiteSpace(profile.UsernameId))
-                {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = "شناسه کاربری الزامی است."
-                    });
-                }
-
+                // شناسه رکورد (UsernameId) اختیاری است؛ خالی = null
                 profile.UsernameId =
-                    profile.UsernameId.Trim();
+                    string.IsNullOrWhiteSpace(profile.UsernameId)
+                        ? null
+                        : profile.UsernameId.Trim();
 
-                if (!IsValidUsernameId(profile.UsernameId))
+                if (profile.UsernameId != null &&
+                    !IsValidUsernameId(profile.UsernameId))
                 {
                     return BadRequest(new
                     {
@@ -881,6 +885,7 @@ namespace Rasam.Controllers
                 // =========================================================
 
                 var duplicateUsername =
+                    profile.UsernameId != null &&
                     await _context.Profile
                         .AnyAsync(x =>
                             x.Id != profile.Id &&
@@ -993,102 +998,12 @@ namespace Rasam.Controllers
 
 
                 // =========================================================
-                // FOLDER PATHS
+                // FOLDER PATHS  (بر پایهٔ Id؛ با تغییر شناسه کاربری
+                // نیازی به تغییر نام یا جابه‌جایی پوشه نیست)
                 // =========================================================
 
-                var profilesRoot =
-                    Path.Combine(
-                        _environment.WebRootPath,
-                        "uploads",
-                        "profiles"
-                    );
-
-                oldFolder =
-                   Path.Combine(
-                       profilesRoot,
-                       oldUsername ?? string.Empty
-                   );
-
-                newFolder =
-                   Path.Combine(
-                       profilesRoot,
-                       newUsername
-                   );
-
-
-                // =========================================================
-                // RENAME PROFILE FOLDER
-                // =========================================================
-
-                if (usernameChanged)
-                {
-                    if (Directory.Exists(newFolder))
-                    {
-                        return Conflict(new
-                        {
-                            success = false,
-                            message =
-                                "پوشه شناسه کاربری جدید از قبل وجود دارد."
-                        });
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(oldUsername) &&
-                        Directory.Exists(oldFolder))
-                    {
-                        Directory.Move(
-     oldFolder,
-     newFolder
- );
-
-                        folderRenamed = true;
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(
-                            newFolder
-                        );
-                    }
-
-
-                    // Update Attachment URLs
-                    foreach (var attachment in existingProfile.Attachments)
-                    {
-                        var fileName =
-                            Path.GetFileName(attachment.FilePath);
-
-                        attachment.FilePath =
-                            Path.Combine(
-                                newFolder,
-                                fileName
-                            );
-
-                        attachment.FileUrl =
-                            $"/uploads/profiles/" +
-                            $"{newUsername}/{fileName}";
-                    }
-
-
-                    // Update main image URL
-                    if (!string.IsNullOrWhiteSpace(
-                            existingProfile.Image))
-                    {
-                        var imageFileName =
-                            Path.GetFileName(
-                                existingProfile.Image
-                            );
-
-                        existingProfile.Image =
-                            $"/uploads/profiles/" +
-                            $"{newUsername}/" +
-                            $"{imageFileName}";
-                    }
-                }
-                else
-                {
-                    Directory.CreateDirectory(
-                        newFolder
-                    );
-                }
+                var profileFolder = ProfileDir(existingProfile.Id);
+                var attachmentFolder = AttachmentDir(existingProfile.Id);
 
 
                 // =========================================================
@@ -1101,8 +1016,9 @@ namespace Rasam.Controllers
                     existingProfile.Image =
                         RenameProfileImageIfNeeded(
                             existingProfile.Image,
-                            newFolder!,
-                            newUsername,
+                            existingProfile.Id,
+                            profileFolder,
+                            newUsername ?? existingProfile.Id.ToString(),
                             existingProfile.NationalCode
                         );
                 }
@@ -1121,8 +1037,9 @@ namespace Rasam.Controllers
                     existingProfile.Image =
                         await SaveProfileImageAsync(
                             profile.MyFile,
-                            newFolder,
-                            newUsername,
+                            profileFolder,
+                            existingProfile.Id,
+                            newUsername ?? existingProfile.Id.ToString(),
                             existingProfile.NationalCode
                         );
 
@@ -1144,8 +1061,9 @@ namespace Rasam.Controllers
                 if (profile.AttachmentsFiles != null &&
                     profile.AttachmentsFiles.Count > 0)
                 {
-                    foreach (var file in
-                             profile.AttachmentsFiles)
+                    Directory.CreateDirectory(attachmentFolder);
+
+                    foreach (var file in profile.AttachmentsFiles)
                     {
                         if (file == null ||
                             file.Length <= 0)
@@ -1161,7 +1079,7 @@ namespace Rasam.Controllers
 
                         var physicalPath =
                             Path.Combine(
-                                newFolder,
+                                attachmentFolder,
                                 storedFileName
                             );
 
@@ -1189,9 +1107,8 @@ namespace Rasam.Controllers
                                     physicalPath,
 
                                 FileUrl =
-                                    $"/uploads/profiles/" +
-                                    $"{newUsername}/" +
-                                    $"{storedFileName}",
+                                    $"/uploads/{existingProfile.Id}/attachment/" +
+                                    storedFileName,
 
                                 CreateDate =
                                     DateTime.Now.ToString(
@@ -1237,7 +1154,7 @@ namespace Rasam.Controllers
             }
             catch (DbUpdateException)
             {
-                RollbackFolderRename(folderRenamed, newFolder, oldFolder);
+
 
                 return Conflict(new
                 {
@@ -1248,7 +1165,7 @@ namespace Rasam.Controllers
             }
             catch (Exception ex)
             {
-                RollbackFolderRename(folderRenamed, newFolder, oldFolder);
+
 
                 return StatusCode(500, new
                 {
@@ -1314,6 +1231,7 @@ namespace Rasam.Controllers
         private async Task<string> SaveProfileImageAsync(
             IFormFile file,
             string profileFolder,
+            int profileId,
             string usernameId,
             string? nationalCode)
         {
@@ -1346,6 +1264,8 @@ namespace Rasam.Controllers
 
             var fileName = baseName + extension;
 
+            Directory.CreateDirectory(profileFolder);
+
             var finalPath = Path.Combine(profileFolder, fileName);
 
             var tempPath =
@@ -1363,20 +1283,26 @@ namespace Rasam.Controllers
             // اگر تصویر هم‌نام قبلی وجود داشته باشد، جایگزین می‌شود
             System.IO.File.Move(tempPath, finalPath, overwrite: true);
 
-            return
-                $"/uploads/profiles/" +
-                $"{usernameId}/{fileName}";
+            return $"/uploads/{profileId}/profile/{fileName}";
         }
 
-        // اگر کد ملی (یا username) عوض شده باشد، نام فایل تصویر با آن هماهنگ می‌شود
+        // اگر کد ملی (یا username) عوض شده باشد، نام فایل تصویر با آن هماهنگ می‌شود.
+        // فقط برای تصاویری که در مسیر جدید (/uploads/{Id}/profile/) هستند؛
+        // تصاویر قدیمی دست‌نخورده می‌مانند تا آدرسشان خراب نشود.
         private string RenameProfileImageIfNeeded(
             string imageUrl,
+            int profileId,
             string profileFolder,
             string usernameId,
             string? nationalCode)
         {
             try
             {
+                var prefix = $"/uploads/{profileId}/profile/";
+
+                if (!imageUrl.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    return imageUrl;
+
                 var currentName = Path.GetFileName(imageUrl);
 
                 var extension = Path.GetExtension(currentName);
@@ -1386,16 +1312,12 @@ namespace Rasam.Controllers
                         NationalCodeName(nationalCode) ?? usernameId
                     ) + extension.ToLowerInvariant();
 
-                var newUrl =
-                    $"/uploads/profiles/{usernameId}/{desiredName}";
-
                 if (string.Equals(
                         currentName,
                         desiredName,
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    // فقط آدرس پوشه (در صورت تغییر username) هماهنگ می‌شود
-                    return newUrl;
+                    return imageUrl;
                 }
 
                 var source = Path.Combine(profileFolder, currentName);
@@ -1410,36 +1332,11 @@ namespace Rasam.Controllers
 
                 System.IO.File.Move(source, target);
 
-                return newUrl;
+                return prefix + desiredName;
             }
             catch
             {
                 return imageUrl;
-            }
-        }
-
-        // برگرداندن نام پوشه وقتی ذخیرهٔ دیتابیس ناموفق بوده است
-        private static void RollbackFolderRename(
-            bool folderRenamed,
-            string? newFolder,
-            string? oldFolder)
-        {
-            if (!folderRenamed ||
-                string.IsNullOrWhiteSpace(newFolder) ||
-                string.IsNullOrWhiteSpace(oldFolder))
-                return;
-
-            if (Directory.Exists(newFolder) &&
-                !Directory.Exists(oldFolder))
-            {
-                try
-                {
-                    Directory.Move(newFolder, oldFolder);
-                }
-                catch
-                {
-                    // ناموفق بودن برگرداندن نباید خطای اصلی را بپوشاند.
-                }
             }
         }
 

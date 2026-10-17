@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Rasam")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+133bf6c5a4848268cc97d5d518bf9b8c04c19c08")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5fa6cb169574083058ce817c17985d7d6df4764e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Rasam")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Rasam")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
